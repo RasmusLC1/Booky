@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  ID String @id @default(uuid()) // Create a product ID
+  name  String // Name of the product
+  priceiInCents Int // / Price computed in cents, Easy for stripe later down the road
+  filePath  String // File for the purchased item
+  imagePath String // Path for the image
+  description String // Description of item
+  isAvailabelForPurchase Boolean  @default(true) // Trigger for product to be available for purchase
+  createdAt DateTime @default(now()) // Time the link was created
+  updateAt  DateTime  @updatedAt
+  orders Order[]
+  downloadVerifications DownloadVerification[]
+
+}
+
+model User {
+  ID String @id @default(uuid()) // User ID
+  email String @unique // Ensure only one of each email
+  createdAt DateTime @default(now()) // Time the link was created
+  updateAt  DateTime  @updatedAt
+  orders Order[]
+}
+
+model Order {
+  id String @id @default(uuid()) // User ID
+  priceiInCents Int // Stored price in case price changes
+  createdAt DateTime @default(now()) // Time the link was created
+  updateAt  DateTime  @updatedAt
+
+  userID String // User who placed order
+  productID String // Product purchased
+
+  user User @relation(fields: [userID], references: [ID], onDelete: Cascade) 
+  product Product @relation(fields: [productID], references: [ID], onDelete: Restrict)
+}
+
+model DownloadVerification {
+  id String @id @default(uuid()) // User ID
+  expiresAt DateTime // Stored price in case price changes
+  createdAt DateTime @default(now()) // Time the link was created
+  productID String
+  product Product @relation(fields: [productID], references: [ID], onDelete: Cascade)
+}
