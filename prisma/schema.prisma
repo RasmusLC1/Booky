@@ -13,7 +13,7 @@ datasource db {
 model Product {
   ID String @id @default(uuid()) // Create a product ID
   name  String // Name of the product
-  priceiInCents Int // / Price computed in cents, Easy for stripe later down the road
+  pricePaidInCents Int // / Price computed in cents, Easy for stripe later down the road
   filePath  String // File for the purchased item
   imagePath String // Path for the image
   description String // Description of item
@@ -35,7 +35,7 @@ model User {
 
 model Order {
   id String @id @default(uuid()) // User ID
-  priceiInCents Int // Stored price in case price changes
+  pricePaidInCents Int // Stored price in case price changes
   createdAt DateTime @default(now()) // Time the link was created
   updateAt  DateTime  @updatedAt
 

@@ -2,7 +2,7 @@
 CREATE TABLE "Product" (
     "ID" TEXT NOT NULL PRIMARY KEY,
     "name" TEXT NOT NULL,
-    "priceiInCents" INTEGER NOT NULL,
+    "pricePaidInCents" INTEGER NOT NULL,
     "filePath" TEXT NOT NULL,
     "imagePath" TEXT NOT NULL,
     "description" TEXT NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "Order" (
     "id" TEXT NOT NULL PRIMARY KEY,
-    "priceiInCents" INTEGER NOT NULL,
+    "pricePaidInCents" INTEGER NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updateAt" DATETIME NOT NULL,
     "userID" TEXT NOT NULL,
