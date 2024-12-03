@@ -11,12 +11,12 @@ import db from "@/db/db";
 // await waits to continue until it's synced the database
 async function getSalesData() {
   const data = await db.order.aggregate({
-    _sum: { pricePaidInCents: true },
+    _sum: { priceInCents: true },
     _count: true,
   });
 
   return {
-    amount: (data._sum.pricePaidInCents || 0) / 100,
+    amount: (data._sum.priceInCents || 0) / 100,
     numberOfSales: data._count,
   };
 }
@@ -26,7 +26,7 @@ async function getUserData() {
   const [userCount, orderData] = await Promise.all([
     db.user.count(),
     db.order.aggregate({
-      _sum: { pricePaidInCents: true },
+      _sum: { priceInCents: true },
     }),
   ]);
 
@@ -35,7 +35,7 @@ async function getUserData() {
     averageValuePerUser:
       userCount === 0
         ? 0
-        : (orderData._sum.pricePaidInCents || 0) / userCount / 100,
+        : (orderData._sum.priceInCents || 0) / userCount / 100,
   };
 }
 
