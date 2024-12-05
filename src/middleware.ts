@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isValidPassword } from "./lib/isValidPassword";
 
+// Uses browser authentication to sign in
 export async function middleware(req: NextRequest) {
   if ((await isAuthenticated(req)) === false) {
     return new NextResponse("Unauthorized", {
@@ -10,8 +11,8 @@ export async function middleware(req: NextRequest) {
   }
 }
 
+// Handles authentication of user
 async function isAuthenticated(req: NextRequest) {
-  console.log("TEST")
   const authHeader =
     req.headers.get("authorization") || req.headers.get("Authorization")
 

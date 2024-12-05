@@ -39,24 +39,23 @@ async function getUserData() {
   };
 }
 
-
 async function getProductData() {
-    const [activecount, inactivecount] = await Promise.all([
-    db.product.count({where: { isAvailabelForPurchase: true}}),
-    db.product.count({where: { isAvailabelForPurchase: false}}),
-])
-return {
-    activecount, inactivecount
-}
-
+  const [activecount, inactivecount] = await Promise.all([
+    db.product.count({ where: { isAvailabelForPurchase: true } }),
+    db.product.count({ where: { isAvailabelForPurchase: false } }),
+  ]);
+  return {
+    activecount,
+    inactivecount,
+  };
 }
 
 export default async function AdminDashboard() {
-    const [salesData, userData, productData] = await Promise.all ([
-        getSalesData(),
-        getUserData(),
-        getProductData()
-    ])
+  const [salesData, userData, productData] = await Promise.all([
+    getSalesData(),
+    getUserData(),
+    getProductData(),
+  ]);
 
   // different amount of grids depending on screen sizes
   return (
@@ -69,11 +68,17 @@ export default async function AdminDashboard() {
 
       <DashboardCard
         title="Customer"
-        subtitle={`${formatCurrency(userData.averageValuePerUser)} Average Value`}
+        subtitle={`${formatCurrency(
+          userData.averageValuePerUser
+        )} Average Value`}
         body={formatNumber(userData.userCount)}
       />
 
-      <DashboardCard title="Active Products" subtitle={`Inactive: ${formatNumber(productData.inactivecount)}`} body={`Active: ${formatNumber(productData.activecount)}`} />
+      <DashboardCard
+        title="Active Products"
+        subtitle={`Inactive: ${formatNumber(productData.inactivecount)}`}
+        body={`Active: ${formatNumber(productData.activecount)}`}
+      />
     </div>
   );
 }

@@ -1,9 +1,6 @@
 
 // Takes a password and a stored hash of a password
 export async function isValidPassword(password: string, hashedPassword: string) {
-
-    console.log(await hashpassword(password), hashedPassword)
-    console.log("TEST")
     return (await hashpassword(password)) == hashedPassword
     
 }
