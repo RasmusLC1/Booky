@@ -6,6 +6,7 @@ import {
   toggleProductAvailability,
 } from "../../_actions/products";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { useRouter } from "next/navigation";
 export function ActiveToggleDropdownItem({
   ID,
   isAvailabelForPurchase,
@@ -15,11 +16,15 @@ export function ActiveToggleDropdownItem({
 }) {
   const [isPending, startTransition] = useTransition();
 
+    const router = useRouter() 
+
   return (
     <DropdownMenuItem
       onClick={() => {
         startTransition(async () => {
           await toggleProductAvailability(ID, !isAvailabelForPurchase);
+          router.refresh() // Refreshes the page when triggered
+
         });
       }}
     >
@@ -37,6 +42,7 @@ export function DeleteDropdownItem({
   disabled: boolean;
 }) {
   const [isPending, startTransition] = useTransition();
+  const router = useRouter()
 
   return (
     <DropdownMenuItem
@@ -45,6 +51,7 @@ export function DeleteDropdownItem({
       onClick={() => {
         startTransition(async () => {
           await deleteProduct(ID);
+          router.refresh()
         });
       }}
     >
