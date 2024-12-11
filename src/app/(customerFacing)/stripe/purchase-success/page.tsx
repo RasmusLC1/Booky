@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import db from "@/db/db";
 import { formatCurrency } from "@/lib/formatters";
-import  Link from "next/link";
+import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import Stripe from "stripe";
@@ -25,11 +25,13 @@ export default async function SuccessPage({
 
   if (product == null) return notFound();
 
-  const isSuccess = paymentIntent.status === "succeeded"
+  const isSuccess = paymentIntent.status === "succeeded";
 
   return (
     <div className="max-w-5xl w-full mx-auto space-y-8">
-        <h1 className = "text-4xl font-bold">{isSuccess ?"Success!" :"Something went wrong"}</h1>
+      <h1 className="text-4xl font-bold">
+        {isSuccess ? "Success!" : "Something went wrong"}
+      </h1>
       <div className="flex gap-4 items-center">
         <div className="aspect-video flex-shrink-0 w-1/3 relative">
           <Image
@@ -47,11 +49,34 @@ export default async function SuccessPage({
           <div className="line-clamp-3 text-muted-foreground">
             {product.description}
           </div>
-          <Button className = "mt-4" size="lg" asChild>
-            {isSuccess? (<a></a>): (<Link href={`/products/${product.ID}/purchase`}> Try Again </Link> )}
+          <Button className="mt-4" size="lg" asChild>
+            {isSuccess ? (
+              <a
+              href={`/products/download/${await createDownloadVerification(
+                product.ID
+              )}`}
+              >
+                Download
+              </a>
+            ) : (
+              <Link href={`/products/${product.ID}/purchase`}> Try Again </Link>
+            )}
           </Button>
         </div>
       </div>
     </div>
   );
 }
+
+// Expire link after 24 hours
+async function createDownloadVerification(productID: string) {
+    const millisecondsInDay = 1000 * 60 * 60 * 24
+    return (
+      await db.downloadVerification.create({
+        data: {
+          productID,
+          expiresAt: new Date(Date.now() + millisecondsInDay),
+        },
+      })
+    ).id
+  }
