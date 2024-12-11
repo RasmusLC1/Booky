@@ -5,25 +5,26 @@ import { Product } from "@prisma/client";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
+import {cache} from "@/lib/cache"
 
 // Find the orders that are available for purchase
 // Orders them by order count
 // Shows the first 6
-function getMostPopularProducts() {
+const getMostPopularProducts = cache(() => {
   return db.product.findMany({
     where: { isAvailabelForPurchase: true },
     orderBy: { orders: { _count: "desc" } },
     take: 6,
   });
-}
+}, ["/", "getMostPopularProducts"], {revalidate: 60 * 60 * 24}) // homepage so just / and name for that section of the page, refresh every 24 hours
 
-function getNewestProducts() {
+const getNewestProducts = cache(() => {
   return db.product.findMany({
     where: { isAvailabelForPurchase: true },
     orderBy: { createdAt: "desc" },
     take: 6,
   });
-}
+}, ["/", "getNewestProducts"])
 
 export default function HomePage() {
   return (
