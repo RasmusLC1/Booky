@@ -28,7 +28,7 @@ type CheckoutFormProps = {
     name: string;
     priceInCents: number;
     description: string;
-    ID: string;
+    id: string;
   };
   clientSecret: string;
 };
@@ -60,14 +60,14 @@ export function CheckoutForm({ product, clientSecret }: CheckoutFormProps) {
         </div>
       </div>
       <Elements options={{ clientSecret }} stripe={stripePromise}>
-        <Form priceInCents={product.priceInCents} productID={product.ID} />
+        <Form priceInCents={product.priceInCents} productid={product.id} />
       </Elements>
       ;
     </div>
   );
 }
 
-function Form({ priceInCents, productID }: { priceInCents: number, productID: string }) {
+function Form({ priceInCents, productid }: { priceInCents: number, productid: string }) {
   const stripe = useStripe();
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
@@ -82,7 +82,7 @@ function Form({ priceInCents, productID }: { priceInCents: number, productID: st
     setIsLoading(true);
 
     // Check ofr existing order
-    const orderExists = await userOrderExists(email, productID)
+    const orderExists = await userOrderExists(email, productid)
 
     if (orderExists){
         setErrorMessage("You have already purchased this product, check your products")

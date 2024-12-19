@@ -17,10 +17,10 @@ export default async function SuccessPage({
     searchParams.payment_intent
   );
 
-  if (paymentIntent.metadata.productID == null) return notFound();
+  if (paymentIntent.metadata.productid == null) return notFound();
 
   const product = await db.product.findUnique({
-    where: { ID: paymentIntent.metadata.productID },
+    where: { id: paymentIntent.metadata.productid },
   });
 
   if (product == null) return notFound();
@@ -53,13 +53,13 @@ export default async function SuccessPage({
             {isSuccess ? (
               <a
               href={`/products/download/${await createDownloadVerification(
-                product.ID
+                product.id
               )}`}
               >
                 Download
               </a>
             ) : (
-              <Link href={`/products/${product.ID}/purchase`}> Try Again </Link>
+              <Link href={`/products/${product.id}/purchase`}> Try Again </Link>
             )}
           </Button>
         </div>
@@ -69,12 +69,12 @@ export default async function SuccessPage({
 }
 
 // Expire link after 24 hours
-async function createDownloadVerification(productID: string) {
+async function createDownloadVerification(productid: string) {
     const millisecondsInDay = 1000 * 60 * 60 * 24
     return (
       await db.downloadVerification.create({
         data: {
-          productID,
+          productid,
           expiresAt: new Date(Date.now() + millisecondsInDay),
         },
       })

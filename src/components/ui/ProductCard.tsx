@@ -12,7 +12,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 type ProductCardProps = {
-  ID: string;
+  id: string;
   name: string;
   description: string;
   priceInCents: number;
@@ -22,7 +22,7 @@ type ProductCardProps = {
 
 // Actual card layout for products
 export function ProductCard({
-  ID,
+  id,
   name,
   description,
   priceInCents,
@@ -42,7 +42,7 @@ export function ProductCard({
       </CardContent>
       <CardFooter>
         <Button asChild size="lg" className="w-full">
-          <Link href={`/products/${ID}/purchase`}>Purchase</Link>
+          <Link href={`/products/${id}/purchase`}>Purchase</Link>
         </Button>
       </CardFooter>
     </Card>

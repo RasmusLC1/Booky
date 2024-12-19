@@ -9,7 +9,7 @@ export async function GET(
   }: { params: { downloadVerificationID: string } }
 ) {
 
-    // Find data that matches the ID and is not expired
+    // Find data that matches the id and is not expired
   const data = await db.downloadVerification.findUnique({
     where: { id: downloadVerificationID, expiresAt: { gt: new Date() } },
     select: { product: { select: { filePath: true, name: true } } },

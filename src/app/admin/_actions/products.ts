@@ -64,16 +64,16 @@ export async function addProduct(prevState: unknown, formData: FormData) {
 
 // Takes the data and updates the product
 export async function toggleProductAvailability(
-  ID: string,
+  id: string,
   isAvailabelForPurchase: boolean
 ) {
-  await db.product.update({ where: { ID }, data: { isAvailabelForPurchase } });
+  await db.product.update({ where: { id }, data: { isAvailabelForPurchase } });
   revalidatePath("/")
   revalidatePath("/products")
 }
 
-export async function deleteProduct(ID: string) {
-  const product = await db.product.delete({ where: { ID } });
+export async function deleteProduct(id: string) {
+  const product = await db.product.delete({ where: { id } });
   // Return error if product is not found
   if (product === null) return notFound()
   
@@ -89,13 +89,13 @@ const editSchema = addSchema.extend({
   image: imageSchema.optional()
 })
 
-export async function updateProduct(ID: string, prevState: unknown, formData: FormData) {
+export async function updateProduct(id: string, prevState: unknown, formData: FormData) {
   const result = editSchema.safeParse(Object.fromEntries(formData.entries()))
   if (result.success === false) {
     return result.error.formErrors.fieldErrors
   }
   const data = result.data
-  const product = await db.product.findUnique({ where: { ID } })
+  const product = await db.product.findUnique({ where: { id } })
 
   // Error handling in case the product is not found return
   if (product == null) return notFound()
@@ -126,7 +126,7 @@ export async function updateProduct(ID: string, prevState: unknown, formData: Fo
 
   // Create the product
   await db.product.update({
-    where: {ID},
+    where: {id},
     data: {
       name: data.name,
       description: data.description,

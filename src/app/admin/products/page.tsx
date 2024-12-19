@@ -44,7 +44,7 @@ export default function AdminProductsPage() {
 async function ProductsTable() {
   const products = await db.product.findMany({
     select: {
-      ID: true,
+      id: true,
       name: true,
       priceInCents: true,
       isAvailabelForPurchase: true,
@@ -72,7 +72,7 @@ async function ProductsTable() {
       </TableHeader>
       <TableBody>
         {products.map((product) => (
-          <TableRow key={product.ID}>
+          <TableRow key={product.id}>
             <TableCell>
               {product.isAvailabelForPurchase ? (
                 <>
@@ -97,22 +97,22 @@ async function ProductsTable() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   <DropdownMenuItem asChild>
-                    <a download href={`/admin/products/${product.ID}/download`}>
+                    <a download href={`/admin/products/${product.id}/download`}>
                       Download
                     </a>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href={`/admin/products/${product.ID}/edit`}>
+                    <Link href={`/admin/products/${product.id}/edit`}>
                       Edit
                     </Link>
                   </DropdownMenuItem>
                   <ActiveToggleDropdownItem
-                    ID={product.ID}
+                    id={product.id}
                     isAvailabelForPurchase={product.isAvailabelForPurchase}
                   />
                   <DropdownMenuSeparator />
                   <DeleteDropdownItem
-                    ID={product.ID}
+                    id={product.id}
                     disabled={product._count.orders > 0}
                   />
                 </DropdownMenuContent>

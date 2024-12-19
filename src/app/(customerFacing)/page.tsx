@@ -83,7 +83,7 @@ async function ProductSuspense({
 }) {
   {
     return (await productsFetcher()).map((product) => (
-      <ProductCard key={product.ID} {...product} />
+      <ProductCard key={product.id} {...product} />
     ));
   }
 }

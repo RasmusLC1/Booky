@@ -5,11 +5,11 @@ import fs from "fs/promises";
 
 export async function GET(
   req: NextRequest,
-  { params: { ID } }: { params: { ID: string } }
+  { params: { id } }: { params: { id: string } }
 ) {
-  // Select the filepath and name based on ID
+  // Select the filepath and name based on id
   const product = await db.product.findUnique({
-    where: { ID },
+    where: { id },
     select: { filePath: true, name: true },
   });
 

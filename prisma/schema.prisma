@@ -11,45 +11,44 @@ datasource db {
 }
 
 model Product {
-  ID String @id @default(uuid()) // Create a product ID
-  name  String // Name of the product
-  priceInCents Int // / Price computed in cents, Easy for stripe later down the road
-  filePath  String // File for the purchased item
-  imagePath String // Path for the image
-  description String // Description of item
-  isAvailabelForPurchase Boolean  @default(true) // Trigger for product to be available for purchase
-  createdAt DateTime @default(now()) // Time the link was created
-  updateAt  DateTime  @updatedAt
-  orders Order[]
-  downloadVerifications DownloadVerification[]
-
+  id                     String                 @id @default(uuid()) // Create a product id
+  name                   String // Name of the product
+  priceInCents           Int // / Price computed in cents, Easy for stripe later down the road
+  filePath               String // File for the purchased item
+  imagePath              String // Path for the image
+  description            String // Description of item
+  isAvailabelForPurchase Boolean                @default(true) // Trigger for product to be available for purchase
+  createdAt              DateTime               @default(now()) // Time the link was created
+  updateAt               DateTime               @updatedAt
+  orders                 Order[]
+  downloadVerifications  DownloadVerification[]
 }
 
 model User {
-  ID String @id @default(uuid()) // User ID
-  email String @unique // Ensure only one of each email
+  id        String   @id @default(uuid()) // User id
+  email     String   @unique // Ensure only one of each email
   createdAt DateTime @default(now()) // Time the link was created
-  updateAt  DateTime  @updatedAt
-  orders Order[]
+  updateAt  DateTime @updatedAt
+  orders    Order[]
 }
 
 model Order {
-  id String @id @default(uuid()) // User ID
+  id           String   @id @default(uuid()) // User id
   priceInCents Int // Stored price in case price changes
-  createdAt DateTime @default(now()) // Time the link was created
-  updateAt  DateTime  @updatedAt
+  createdAt    DateTime @default(now()) // Time the link was created
+  updateAt     DateTime @updatedAt
 
-  userID String // User who placed order
-  productID String // Product purchased
+  userid    String // User who placed order
+  productid String // Product purchased
 
-  user User @relation(fields: [userID], references: [ID], onDelete: Cascade) 
-  product Product @relation(fields: [productID], references: [ID], onDelete: Restrict)
+  user    User    @relation(fields: [userid], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productid], references: [id], onDelete: Restrict)
 }
 
 model DownloadVerification {
-  id String @id @default(uuid()) // User ID
+  id        String   @id @default(uuid()) // User id
   expiresAt DateTime // Stored price in case price changes
   createdAt DateTime @default(now()) // Time the link was created
-  productID String
-  product Product @relation(fields: [productID], references: [ID], onDelete: Cascade)
+  productid String
+  product   Product  @relation(fields: [productid], references: [id], onDelete: Cascade)
 }

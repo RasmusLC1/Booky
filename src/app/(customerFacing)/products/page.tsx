@@ -36,6 +36,6 @@ const getProducts = cache(() => {
 async function ProductsSuspense() {
   const products = await getProducts();
   return products.map((product) => (
-    <ProductCard key={product.ID} {...product} />
+    <ProductCard key={product.id} {...product} />
   ));
 }
