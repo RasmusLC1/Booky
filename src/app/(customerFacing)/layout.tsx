@@ -13,6 +13,7 @@ export default function CustomerLayout({
 
     // href link that th ebutton goes to, Dashboard etc is name
     return <>
+    <div suppressHydrationWarning>
     <Nav>
         <NavLink href="/"> Home</NavLink>
         <NavLink href="/products"> Products</NavLink>
@@ -21,6 +22,7 @@ export default function CustomerLayout({
 
     <div className = "container my-6">
         {children}
+    </div>
     </div>
     </>
   }

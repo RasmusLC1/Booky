@@ -31,7 +31,7 @@ const getProducts = cache(() => {
     where: { isAvailabelForPurchase: true },
     orderBy: { name: "asc" },
   });
-}, ["/products", "getProducts"])
+}, ["/products", "getProducts"], {revalidate: 60 * 60 * 24})
 
 async function ProductsSuspense() {
   const products = await getProducts();

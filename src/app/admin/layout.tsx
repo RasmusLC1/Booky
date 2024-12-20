@@ -13,15 +13,19 @@ export default function AdminLayout({
 
     // href link that th ebutton goes to, Dashboard etc is name
     return <>
-    <Nav>
-        <NavLink href="/admin"> Dashboard</NavLink>
-        <NavLink href="/admin/products"> Products</NavLink>
-        <NavLink href="/admin/users"> Customers</NavLink>
-        <NavLink href="/admin/orders"> Sales</NavLink>
-    </Nav>
+    <div suppressHydrationWarning>
 
-    <div className = "container my-6">
-        {children}
+      <Nav>
+          <NavLink href="/admin"> Dashboard</NavLink>
+          <NavLink href="/admin/products"> Products</NavLink>
+          <NavLink href="/admin/users"> Customers</NavLink>
+          <NavLink href="/admin/orders"> Sales</NavLink>
+      </Nav>
+
+      <div className = "container my-6">
+          {children}
+      </div>
     </div>
+
     </>
   }

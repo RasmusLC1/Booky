@@ -24,7 +24,7 @@ const getNewestProducts = cache(() => {
     orderBy: { createdAt: "desc" },
     take: 6,
   });
-}, ["/", "getNewestProducts"])
+}, ["/", "getNewestProducts"], {revalidate: 60 * 60 * 24})
 
 export default function HomePage() {
   return (
