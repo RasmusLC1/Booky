@@ -1,25 +1,38 @@
-import db from "@/db/db"
-import { notFound } from "next/navigation"
-import Stripe from "stripe"
-import { CheckoutForm } from "./_components/CheckoutForm"
+import db from "@/db/db";
+import { notFound } from "next/navigation";
+import Stripe from "stripe";
+import { CheckoutForm } from "./_components/CheckoutForm";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
-export default async function PurchasePage({params: {id},}: {params: {id: string}}) {
-    
-    const product = await db.product.findUnique({where:{id}})
+export default async function PurchasePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  // Await params before destructuring
+  const { id } = await params;
 
-    if (product === null) return notFound()
+  const product = await db.product.findUnique({ where: { id } });
 
-    const paymentIntent = await stripe.paymentIntents.create({
-        amount: product.priceInCents,
-        currency: "USD",
-        metadata: {productid: product.id},
-    })
+  if (product === null) return notFound();
 
-    if (paymentIntent.client_secret == null){
-        throw Error("Stripe failed to create payment intent, Products/id/purchase/page")
-    }
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: product.priceInCents,
+    currency: "USD",
+    metadata: { productid: product.id },
+  });
 
-    return <CheckoutForm product = {product} clientSecret = {paymentIntent.client_secret}/>
+  if (paymentIntent.client_secret == null) {
+    throw Error(
+      "Stripe failed to create payment intent, Products/id/purchase/page"
+    );
+  }
+
+  return (
+    <CheckoutForm
+      product={product}
+      clientSecret={paymentIntent.client_secret}
+    />
+  );
 }

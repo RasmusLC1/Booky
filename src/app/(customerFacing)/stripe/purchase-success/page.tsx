@@ -13,8 +13,9 @@ export default async function SuccessPage({
 }: {
   searchParams: { payment_intent: string };
 }) {
+  const params = await searchParams
   const paymentIntent = await stripe.paymentIntents.retrieve(
-    searchParams.payment_intent
+    params.payment_intent
   );
 
   if (paymentIntent.metadata.productid == null) return notFound();
