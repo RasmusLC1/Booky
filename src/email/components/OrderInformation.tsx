@@ -8,12 +8,12 @@ import {
   Text,
 } from "@react-email/components";
 
-const serverUrl = "http://localhost:3000";
 
 type OrderInformationProps = {
-  order: { id: string; createdAt: Date; pricePaidInCents: number };
+  order: { id: string; createdAt: Date; priceInCents: number };
   product: { imagePath: string; name: string; description: string };
   downloadVerificationId: string;
+  serverUrl: string
 };
 
 const dateFormatter = new Intl.DateTimeFormat("en", { dateStyle: "medium" });
@@ -22,6 +22,7 @@ export function OrderInformation({
   order,
   product,
   downloadVerificationId,
+  serverUrl
 }: OrderInformationProps) {
   return (
     <>
@@ -43,7 +44,7 @@ export function OrderInformation({
             <Text className="mb-0 text-gray-500 whitespace-nowrap text-nowrap mr-4">
               Price Paid
             </Text>
-            <Text>{formatCurrency(order.pricePaidInCents / 100)}</Text>
+            <Text>{formatCurrency(order.priceInCents / 100)}</Text>
           </Column>
         </Row>
       </Section>

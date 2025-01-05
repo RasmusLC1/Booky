@@ -23,7 +23,7 @@ export async function emailOrderHistory(
       email: true,
       orders: {
         select: {
-          pricePaidInCents: true,
+          priceInCents: true,
           id: true,
           createdAt: true,
           product: {
@@ -53,7 +53,7 @@ export async function emailOrderHistory(
         await db.downloadVerification.create({
           data: {
             expiresAt: new Date(Date.now() + 24 * 1000 * 60 * 60),
-            productId: order.product.id,
+            productid: order.product.id,
           },
         })
       ).id,
@@ -64,7 +64,7 @@ export async function emailOrderHistory(
     from: `Support <${process.env.SENDER_EMAIL}>`,
     to: user.email,
     subject: "Order History",
-    react: <OrderHistoryEmail orders={await Promise.all(orders)} />,
+    react: <OrderHistoryEmail orders={await Promise.all(orders)} serverUrl={process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000"} />,
   })
 
   if (data.error) {

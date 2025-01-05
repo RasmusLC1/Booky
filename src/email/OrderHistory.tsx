@@ -14,7 +14,7 @@ import React from "react"
 type OrderHistoryEmailProps = {
   orders: {
     id: string
-    pricePaidInCents: number
+    priceInCents: number
     createdAt: Date
     downloadVerificationId: string
     product: {
@@ -23,6 +23,7 @@ type OrderHistoryEmailProps = {
       description: string
     }
   }[]
+  serverUrl: string
 }
 
 OrderHistoryEmail.PreviewProps = {
@@ -30,7 +31,7 @@ OrderHistoryEmail.PreviewProps = {
     {
       id: crypto.randomUUID(),
       createdAt: new Date(),
-      pricePaidInCents: 10000,
+      priceInCents: 10000,
       downloadVerificationId: crypto.randomUUID(),
       product: {
         name: "Product name",
@@ -42,7 +43,7 @@ OrderHistoryEmail.PreviewProps = {
     {
       id: crypto.randomUUID(),
       createdAt: new Date(),
-      pricePaidInCents: 2000,
+      priceInCents: 2000,
       downloadVerificationId: crypto.randomUUID(),
       product: {
         name: "Product name 2",
@@ -52,9 +53,10 @@ OrderHistoryEmail.PreviewProps = {
       },
     },
   ],
+  serverUrl: "http://localhost:3000"
 } satisfies OrderHistoryEmailProps
 
-export default function OrderHistoryEmail({ orders }: OrderHistoryEmailProps) {
+export default function OrderHistoryEmail({ orders, serverUrl}: OrderHistoryEmailProps) {
   return (
     <Html>
       <Preview>Order History & Downloads</Preview>
@@ -69,6 +71,7 @@ export default function OrderHistoryEmail({ orders }: OrderHistoryEmailProps) {
                   order={order}
                   product={order.product}
                   downloadVerificationId={order.downloadVerificationId}
+                  serverUrl={serverUrl}
                 />
                 {index < orders.length - 1 && <Hr />}
               </React.Fragment>
