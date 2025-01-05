@@ -5,13 +5,13 @@ import fs from "fs/promises";
 export async function GET(
   request: NextRequest,
   {
-    params: { downloadVerificationID },
-  }: { params: { downloadVerificationID: string } }
+    params: { downloadVerificationId },
+  }: { params: { downloadVerificationId: string } }
 ) {
 
     // Find data that matches the id and is not expired
   const data = await db.downloadVerification.findUnique({
-    where: { id: downloadVerificationID, expiresAt: { gt: new Date() } },
+    where: { id: downloadVerificationId, expiresAt: { gt: new Date() } },
     select: { product: { select: { filePath: true, name: true } } },
   });
 
@@ -28,7 +28,7 @@ export async function GET(
   // Handle the server response for downloading the file
   return new NextResponse(file, {
     headers: {
-      "Content-Disposition": `attackment; filename="${data.product.name}.${extension}"`,
+      "Content-Disposition": `attachment; filename="${data.product.name}.${extension}"`,
       "Content-Length": size.toString(),
     },
   });

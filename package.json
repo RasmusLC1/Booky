@@ -6,13 +6,15 @@
     "dev": "concurrently \"stripe listen --forward-to http://localhost:3000/webhooks/stripe\" \"next dev\"",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "email": "email dev --dir src/email --port 3001"
   },
   "dependencies": {
     "@prisma/client": "^6.0.0",
     "@radix-ui/react-dropdown-menu": "^2.1.2",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-slot": "^1.1.0",
+    "@react-email/components": "^0.0.31",
     "@stripe/react-stripe-js": "^3.0.0",
     "@stripe/stripe-js": "^5.2.0",
     "class-variance-authority": "^0.7.1",
@@ -36,6 +38,7 @@
     "eslint-config-next": "15.0.3",
     "postcss": "^8",
     "prisma": "^6.0.0",
+    "react-email": "^3.0.4",
     "tailwindcss": "^3.4.1",
     "ts-node": "^10.9.2",
     "typescript": "^5"
