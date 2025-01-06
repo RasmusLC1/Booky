@@ -2,7 +2,7 @@ import { ProductCard, ProductCardSkeleton } from "@/components/ui/ProductCard";
 import db from "@/db/db";
 import { Suspense } from "react";
 import {cache} from "@/lib/cache"
-import ProductsSearch from "./_components/searchBar";
+import ProductsClient from "./_components/ProductsClient";
 
 
 export default function ProductsPage() {
@@ -39,7 +39,7 @@ async function ProductsSuspense() {
   const products = await getProducts();
   return (
     <div>
-      <ProductsSearch products={products}/>
+      <ProductsClient products={products}/>
     </div>
   );
 }
