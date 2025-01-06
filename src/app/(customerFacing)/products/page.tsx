@@ -2,12 +2,13 @@ import { ProductCard, ProductCardSkeleton } from "@/components/ui/ProductCard";
 import db from "@/db/db";
 import { Suspense } from "react";
 import {cache} from "@/lib/cache"
+import ProductsSearch from "./_components/searchBar";
 
 
 export default function ProductsPage() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3  gap-4">
-      {/* {While function is waiting to load it loads 3 product card skeletons as placeholders} */}
+    <div>
+      {/* {While function is waiting to load it loads 6 product card skeletons as placeholders} */}
       <Suspense
         fallback={
           <>
@@ -33,9 +34,12 @@ const getProducts = cache(() => {
   });
 }, ["/products", "getProducts"], {revalidate: 60 * 60 * 24})
 
+
 async function ProductsSuspense() {
   const products = await getProducts();
-  return products.map((product) => (
-    <ProductCard key={product.id} {...product} />
-  ));
+  return (
+    <div>
+      <ProductsSearch products={products}/>
+    </div>
+  );
 }
