@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { EdgeStoreProvider } from '@/lib/edgestore'
 import "./globals.css";
 
 const geistSans = localFont({
@@ -29,7 +30,7 @@ export default function RootLayout({
         suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <EdgeStoreProvider>{children}</EdgeStoreProvider>
       </body>
     </html>
   );

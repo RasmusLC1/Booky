@@ -11,6 +11,8 @@ import { addProduct, updateProduct } from "../../_actions/products";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { Product } from "@prisma/client";
+import { useEdgeStore } from "@/lib/edgestore";
+import Link from "next/link";
 
 interface ProductFormProps {
   product?: Product | null;
@@ -26,19 +28,49 @@ export function ProductForm({ product }: ProductFormProps) {
   const [error, action] = useActionState(actionFn, {});
 
   // State for priceInCents
-  const [priceInCents, setPriceInCents] = useState<number | undefined>(product?.priceInCents);
+  const [priceInCents, setPriceInCents] = useState<number | undefined>(
+    product?.priceInCents
+  );
+
+  // File handler
+  const [file, setFile] = useState<File>();
+  const { edgestore } = useEdgeStore();
+  const [imageProgress, setImageProgress] = useState(0);
+  const [fileProgress, setFileProgress] = useState(0);
+  const [imageUrls, setImageUrls] = useState<{
+    url: string;
+    thumbnailUrl: string | null;
+  }>();
+
+  const [fileUrls, setFileUrls] = useState<{
+    url: string;
+    size: number;
+  }>();
 
   return (
     <form action={action} className="space-y-8">
       {/* Name Field */}
       <div className="space-y-2">
         <Label htmlFor="name">Name</Label>
-        <Input 
-          type="text" 
-          id="name" 
-          name="name" 
-          required 
-          defaultValue={product?.name || ""} 
+        <Input
+          type="text"
+          id="name"
+          name="name"
+          required
+          defaultValue={product?.name || ""}
+        />
+        {error?.name && <div className="text-destructive">{error.name}</div>}
+      </div>
+
+      {/* Category Field */}
+      <div className="space-y-2">
+        <Label htmlFor="category">Category</Label>
+        <Input
+          type="text"
+          id="category"
+          name="category"
+          required
+          defaultValue={product?.category || ""}
         />
         {error?.name && <div className="text-destructive">{error.name}</div>}
       </div>
@@ -57,7 +89,9 @@ export function ProductForm({ product }: ProductFormProps) {
         <div className="text-muted-foreground">
           {formatCurrency((priceInCents || 0) / 100)}
         </div>
-        {error?.priceInCents && <div className="text-destructive">{error.priceInCents}</div>}
+        {error?.priceInCents && (
+          <div className="text-destructive">{error.priceInCents}</div>
+        )}
       </div>
 
       {/* Description Field */}
@@ -69,27 +103,113 @@ export function ProductForm({ product }: ProductFormProps) {
           required
           defaultValue={product?.description || ""}
         />
-        {error?.description && <div className="text-destructive">{error.description}</div>}
+        {error?.description && (
+          <div className="text-destructive">{error.description}</div>
+        )}
       </div>
 
       {/* File Field */}
       <div className="space-y-2">
         <Label htmlFor="file">File</Label>
-        <Input type="file" id="file" name="file" required={product == null} />
-        {product?.filePath && (
-          <div className="text-muted-foreground">{product.filePath}</div>
+        <Input
+          type="file"
+          id="file"
+          name="file"
+          required={!product}
+          onChange={(e) => {
+            setFile(e.target.files?.[0]);
+          }}
+        />
+        <div className="h-[6px] w-44 border rounded overflow-hidden">
+          <div
+            className="h-full bg-black duration-150"
+            style={{
+              width: `${fileProgress}%`,
+            }}
+          ></div>
+        </div>
+
+        <Button
+          type="button"
+          onClick={async () => {
+            if (file) {
+              const res = await edgestore.myPublicFiles.upload({
+                file,
+                onProgressChange: (progress) => {
+                  setFileProgress(progress);
+                },
+              });
+
+              // Can potentially save image to personal database here
+              setFileUrls({
+                url: res.url,
+                size: res.size,
+              });
+            }
+          }}
+        >
+          Upload
+        </Button>
+        {fileUrls?.url && (
+          <Link href={fileUrls.url} target="_blank">
+            URL
+          </Link>
         )}
-        {error?.file && <div className="text-destructive">{error.file}</div>}
+        {fileUrls?.size && <h1>{fileUrls.size / 1024} KB </h1>}
       </div>
 
       {/* Image Field */}
       <div className="space-y-2">
         <Label htmlFor="image">Image</Label>
-        <Input type="file" id="image" name="image" required={product == null} />
-        {product?.imagePath && (
-          <Image src={product.imagePath} height={400} width={400} alt="Product" />
+        <Input
+          type="file"
+          id="image"
+          name="image"
+          required={!product}
+          onChange={(e) => {
+            setFile(e.target.files?.[0]);
+          }}
+        />
+        <div className="h-[6px] w-44 border rounded overflow-hidden">
+          <div
+            className="h-full bg-black duration-150"
+            style={{
+              width: `${imageProgress}%`,
+            }}
+          ></div>
+        </div>
+
+        <Button
+          type="button"
+          onClick={async () => {
+            if (file) {
+              const res = await edgestore.myPublicImages.upload({
+                file,
+                onProgressChange: (progress) => {
+                  setImageProgress(progress);
+                },
+              });
+
+              // Can potentially save image to personal database here
+              setImageUrls({
+                url: res.url,
+                thumbnailUrl: res.thumbnailUrl,
+              });
+            }
+          }}
+        >
+          Upload
+        </Button>
+        {imageUrls?.url && (
+          <Link href={imageUrls.url} target="_blank">
+            URL
+          </Link>
         )}
-        {error?.image && <div className="text-destructive">{error.image}</div>}
+        {imageUrls?.thumbnailUrl && (
+          <Link href={imageUrls.thumbnailUrl} target="_blank">
+            THUMBNAILURL
+          </Link>
+        )}
       </div>
 
       <SubmitButton />

@@ -14,9 +14,8 @@ export async function POST(req: NextRequest) {
     process.env.STRIPE_WEBHOOK_SECRET as string
   )
 
-  console.log("EVENT TYPE: ",event.type)
   if (event.type === "charge.succeeded") {
-    const charge = event.data.object
+    const charge = event.data.object as Stripe.Charge
     const productid = charge.metadata.productid
     const email = charge.billing_details.email
     const priceInCents = charge.amount
@@ -26,19 +25,33 @@ export async function POST(req: NextRequest) {
       return new NextResponse("Bad Request", { status: 400 })
     }
 
+    // 1. Check if user exists
+    const user = await db.user.findUnique({
+      where: { email },
+    })
+
+    // 2. If user does NOT exist, return error
+    if (!user) {
+      return NextResponse.json(
+        { message: "User does not exist. Please create an account." },
+        { status: 404 }
+      )
+    }
+
+    // 3. If the user exists, handle the order
     const userFields = {
       email,
       orders: { create: { productid, priceInCents } },
     }
     const {
       orders: [order],
-    } = await db.user.upsert({
+    } = await db.user.update({
       where: { email },
-      create: userFields,
-      update: userFields,
+      data: userFields,
       select: { orders: { orderBy: { createdAt: "desc" }, take: 1 } },
     })
 
+    // Create a download link
     const downloadVerification = await db.downloadVerification.create({
       data: {
         productid,
@@ -46,6 +59,7 @@ export async function POST(req: NextRequest) {
       },
     })
 
+    // Send an email to the existing user
     await resend.emails.send({
       from: `Support <${process.env.SENDER_EMAIL}>`,
       to: email,

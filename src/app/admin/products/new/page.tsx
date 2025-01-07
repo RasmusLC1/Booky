@@ -1,10 +1,19 @@
 import { PageHeader } from "../../_components/PageHeader";
 import { ProductForm } from "../_components/ProductForm";
 
-
-export default function NewProductPage(){
-    return <>
-    <PageHeader> Add Product </PageHeader>
-    <ProductForm/>
-    </>
-}
+export const config = {
+    api: {
+      bodyParser: {
+        sizeLimit: "100mb",
+      },
+    },
+  };
+  
+  export default function NewProductPage() {
+    return (
+      <>
+        <PageHeader> Add Product </PageHeader>
+        <ProductForm />
+      </>
+    );
+  }
