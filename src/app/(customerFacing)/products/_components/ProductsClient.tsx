@@ -12,7 +12,7 @@ type Product = {
     priceInCents: number;
     imagePath: string;
     createdAt: Date;   
-    updateAt: Date;    
+    updatedAt: Date;    
   };
 
 interface ProductsClientProps {
@@ -24,7 +24,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
   const dateFixedProducts = products.map((p) => ({
     ...p,
     createdAt: new Date(p.createdAt),
-    updateAt: new Date(p.updateAt),
+    updatedAt: new Date(p.updatedAt),
   }));
 
   // 2) Track which filter is selected

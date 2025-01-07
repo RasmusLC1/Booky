@@ -3,6 +3,7 @@ import "./loginform.css";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import Link from "next/link";
 
 function google_logo() {
   return (
@@ -61,11 +62,16 @@ export default function Login() {
               placeholder="password"
             ></Input>
 
-            <Button type="submit" className = "submit_button">
-                Login
+            <Button type="submit" className="submit_button">
+              Login
             </Button>
+            <Link href="/signup" passHref>
+              <Button type="submit" className="submit_button">Registrer</Button>
+            </Link>
           </form>
-          <p className="mt-4 text-xs text-slate-400">@2025 All rights reserved</p>
+          <p className="mt-4 text-xs text-slate-400">
+            @2025 All rights reserved
+          </p>
         </div>
       </div>
     </main>

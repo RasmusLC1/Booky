@@ -10,7 +10,7 @@ type Product = {
     priceInCents: number;
     imagePath: string;
     createdAt: Date;   
-    updateAt: Date;    
+    updatedAt: Date;    
   };
 
 interface ProductsSearchProps {

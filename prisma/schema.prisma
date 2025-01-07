@@ -17,9 +17,13 @@ model Product {
   filePath               String // File for the purchased item
   imagePath              String // Path for the image
   description            String // Description of item
+  category               String // category of item
+  length                 Int // Length of book, based on character amount
   isAvailabelForPurchase Boolean                @default(true) // Trigger for product to be available for purchase
   createdAt              DateTime               @default(now()) // Time the link was created
-  updateAt               DateTime               @updatedAt
+  updatedAt              DateTime               @updatedAt
+  reviews                String
+  Score                  Int
   orders                 Order[]
   downloadVerifications  DownloadVerification[]
 }
@@ -27,8 +31,10 @@ model Product {
 model User {
   id        String   @id @default(uuid()) // User id
   email     String   @unique // Ensure only one of each email
+  username  String   @unique // Ensure only one of each email
+  password  String
   createdAt DateTime @default(now()) // Time the link was created
-  updateAt  DateTime @updatedAt
+  updatedAt DateTime @updatedAt
   orders    Order[]
 }
 
@@ -36,13 +42,24 @@ model Order {
   id           String   @id @default(uuid()) // User id
   priceInCents Int // Stored price in case price changes
   createdAt    DateTime @default(now()) // Time the link was created
-  updateAt     DateTime @updatedAt
+  updatedAt    DateTime @updatedAt
 
   userid    String // User who placed order
   productid String // Product purchased
 
   user    User    @relation(fields: [userid], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productid], references: [id], onDelete: Restrict)
+}
+
+model Review {
+  id        String   @id @default(uuid()) // review id
+  productid String
+  userid    String // User who placed order
+  headline  String
+  text      String
+  createdAt DateTime @default(now()) // Time the link was created
+  updatedAt DateTime @updatedAt
+  rating    Int
 }
 
 model DownloadVerification {
