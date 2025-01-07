@@ -13,6 +13,8 @@ import { useFormStatus } from "react-dom";
 import { Product } from "@prisma/client";
 import { useEdgeStore } from "@/lib/edgestore";
 import Link from "next/link";
+import { SingleImageDropzone } from "@/components/ImageUpload";
+import { SingleFileDropzone } from "@/components/FileUpload";
 
 interface ProductFormProps {
   product?: Product | null;
@@ -34,6 +36,7 @@ export function ProductForm({ product }: ProductFormProps) {
 
   // File handler
   const [file, setFile] = useState<File>();
+  const [image, setImage] = useState<File>();
   const { edgestore } = useEdgeStore();
   const [imageProgress, setImageProgress] = useState(0);
   const [fileProgress, setFileProgress] = useState(0);
@@ -111,7 +114,7 @@ export function ProductForm({ product }: ProductFormProps) {
       {/* File Field */}
       <div className="space-y-2">
         <Label htmlFor="file">File</Label>
-        <Input
+        {/* <Input
           type="file"
           id="file"
           name="file"
@@ -119,7 +122,17 @@ export function ProductForm({ product }: ProductFormProps) {
           onChange={(e) => {
             setFile(e.target.files?.[0]);
           }}
+        /> */}
+
+        <SingleFileDropzone
+          width={200}
+          height={200}
+          value={file}
+          onChange={(file) => {
+            setFile(file);
+          }}
         />
+
         <div className="h-[6px] w-44 border rounded overflow-hidden">
           <div
             className="h-full bg-black duration-150"
@@ -140,7 +153,6 @@ export function ProductForm({ product }: ProductFormProps) {
                 },
               });
 
-              // Can potentially save image to personal database here
               setFileUrls({
                 url: res.url,
                 size: res.size,
@@ -152,7 +164,7 @@ export function ProductForm({ product }: ProductFormProps) {
         </Button>
         {fileUrls?.url && (
           <Link href={fileUrls.url} target="_blank">
-            URL
+            URL File
           </Link>
         )}
         {fileUrls?.size && <h1>{fileUrls.size / 1024} KB </h1>}
@@ -161,7 +173,7 @@ export function ProductForm({ product }: ProductFormProps) {
       {/* Image Field */}
       <div className="space-y-2">
         <Label htmlFor="image">Image</Label>
-        <Input
+        {/* <Input
           type="file"
           id="image"
           name="image"
@@ -169,7 +181,14 @@ export function ProductForm({ product }: ProductFormProps) {
           onChange={(e) => {
             setFile(e.target.files?.[0]);
           }}
+        /> */}
+        <SingleImageDropzone
+          width={200}
+          height={200}
+          value={image}
+          onChange={(file) => setImage(file)}
         />
+
         <div className="h-[6px] w-44 border rounded overflow-hidden">
           <div
             className="h-full bg-black duration-150"
@@ -182,15 +201,14 @@ export function ProductForm({ product }: ProductFormProps) {
         <Button
           type="button"
           onClick={async () => {
-            if (file) {
+            if (image) {
               const res = await edgestore.myPublicImages.upload({
-                file,
+                file: image,
                 onProgressChange: (progress) => {
                   setImageProgress(progress);
                 },
               });
 
-              // Can potentially save image to personal database here
               setImageUrls({
                 url: res.url,
                 thumbnailUrl: res.thumbnailUrl,
@@ -198,8 +216,9 @@ export function ProductForm({ product }: ProductFormProps) {
             }
           }}
         >
-          Upload
+          Upload Image
         </Button>
+
         {imageUrls?.url && (
           <Link href={imageUrls.url} target="_blank">
             URL

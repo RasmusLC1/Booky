@@ -1,39 +1,26 @@
 'use client';
 
 import { formatFileSize } from '@edgestore/react/utils';
-import {
-  CheckCircleIcon,
-  FileIcon,
-  LucideFileWarning,
-  Trash2Icon,
-  UploadCloudIcon,
-  XIcon,
-} from 'lucide-react';
+import { UploadCloudIcon, X } from 'lucide-react';
 import * as React from 'react';
 import { useDropzone, type DropzoneOptions } from 'react-dropzone';
 import { twMerge } from 'tailwind-merge';
+import { Button } from './ui/button';
 
 const variants = {
-  base: 'relative rounded-md p-4 w-full flex justify-center items-center flex-col cursor-pointer border border-dashed border-gray-400 dark:border-gray-300 transition-colors duration-200 ease-in-out',
+  base: 'relative rounded-md flex justify-center items-center flex-col cursor-pointer min-h-[150px] min-w-[200px] border border-dashed border-gray-400 dark:border-gray-300 transition-colors duration-200 ease-in-out',
   active: 'border-2',
-  disabled:
-    'bg-gray-200 border-gray-300 cursor-default pointer-events-none bg-opacity-30 dark:bg-gray-700 dark:border-gray-600',
+  disabled: 'bg-gray-200 border-gray-300 cursor-default pointer-events-none bg-opacity-30 dark:bg-gray-700',
   accept: 'border border-blue-500 bg-blue-500 bg-opacity-10',
   reject: 'border border-red-700 bg-red-700 bg-opacity-10',
 };
 
-export type FileState = {
-  file: File;
-  key: string; // used to identify the file in the progress callback
-  progress: 'PENDING' | 'COMPLETE' | 'ERROR' | number;
-  abortController?: AbortController;
-};
-
 type InputProps = {
+  width: number;
+  height: number;
   className?: string;
-  value?: FileState[];
-  onChange?: (files: FileState[]) => void | Promise<void>;
-  onFilesAdded?: (addedFiles: FileState[]) => void | Promise<void>;
+  value?: File | string;
+  onChange?: (file?: File) => void | Promise<void>;
   disabled?: boolean;
   dropzoneOptions?: Omit<DropzoneOptions, 'disabled'>;
 };
@@ -42,60 +29,35 @@ const ERROR_MESSAGES = {
   fileTooLarge(maxSize: number) {
     return `The file is too large. Max size is ${formatFileSize(maxSize)}.`;
   },
-  fileInvalidType() {
-    return 'Invalid file type.';
-  },
   tooManyFiles(maxFiles: number) {
     return `You can only add ${maxFiles} file(s).`;
   },
-  fileNotSupported() {
-    return 'The file is not supported.';
-  },
 };
 
-const MultiFileDropzone = React.forwardRef<HTMLInputElement, InputProps>(
-  (
-    { dropzoneOptions, value, className, disabled, onFilesAdded, onChange },
-    ref,
-  ) => {
-    const [customError, setCustomError] = React.useState<string>();
-    if (dropzoneOptions?.maxFiles && value?.length) {
-      disabled = disabled ?? value.length >= dropzoneOptions.maxFiles;
-    }
-    // dropzone configuration
+const SingleFileDropzone = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ dropzoneOptions, width, height, value, className, disabled, onChange }, ref) => {
     const {
       getRootProps,
       getInputProps,
+      acceptedFiles,
       fileRejections,
       isFocused,
       isDragAccept,
       isDragReject,
     } = useDropzone({
+      accept: { 'pdf/*': [] }, // Accept all files
+      multiple: false,
       disabled,
       onDrop: (acceptedFiles) => {
-        const files = acceptedFiles;
-        setCustomError(undefined);
-        if (
-          dropzoneOptions?.maxFiles &&
-          (value?.length ?? 0) + files.length > dropzoneOptions.maxFiles
-        ) {
-          setCustomError(ERROR_MESSAGES.tooManyFiles(dropzoneOptions.maxFiles));
-          return;
-        }
-        if (files) {
-          const addedFiles = files.map<FileState>((file) => ({
-            file,
-            key: Math.random().toString(36).slice(2),
-            progress: 'PENDING',
-          }));
-          void onFilesAdded?.(addedFiles);
-          void onChange?.([...(value ?? []), ...addedFiles]);
+        const file = acceptedFiles[0];
+        if (file) {
+          void onChange?.(file);
         }
       },
       ...dropzoneOptions,
     });
 
-    // styling
+    // Styling
     const dropZoneClassName = React.useMemo(
       () =>
         twMerge(
@@ -106,131 +68,65 @@ const MultiFileDropzone = React.forwardRef<HTMLInputElement, InputProps>(
           isDragAccept && variants.accept,
           className,
         ).trim(),
-      [
-        isFocused,
-        fileRejections,
-        isDragAccept,
-        isDragReject,
-        disabled,
-        className,
-      ],
+      [isFocused, fileRejections, isDragAccept, isDragReject, disabled, className],
     );
 
-    // error validation messages
-    const errorMessage = React.useMemo(() => {
-      if (fileRejections[0]) {
-        const { errors } = fileRejections[0];
-        if (errors[0]?.code === 'file-too-large') {
-          return ERROR_MESSAGES.fileTooLarge(dropzoneOptions?.maxSize ?? 0);
-        } else if (errors[0]?.code === 'file-invalid-type') {
-          return ERROR_MESSAGES.fileInvalidType();
-        } else if (errors[0]?.code === 'too-many-files') {
-          return ERROR_MESSAGES.tooManyFiles(dropzoneOptions?.maxFiles ?? 0);
-        } else {
-          return ERROR_MESSAGES.fileNotSupported();
-        }
-      }
-      return undefined;
-    }, [fileRejections, dropzoneOptions]);
+    // Error messages
+    const errorMessage = fileRejections[0]?.errors[0]?.message;
 
     return (
-      <div className="w-full">
-        <div className="flex w-full flex-col gap-2">
-          <div className="w-full">
-            {/* Main File Input */}
-            <div
-              {...getRootProps({
-                className: dropZoneClassName,
-              })}
-            >
-              <input ref={ref} {...getInputProps()} />
-              <div className="flex flex-col items-center justify-center text-xs text-gray-400">
-                <UploadCloudIcon className="mb-1 h-7 w-7" />
-                <div className="text-gray-400">
-                  drag & drop or click to upload
+      <div>
+        <div
+          {...getRootProps({
+            className: dropZoneClassName,
+            style: { width, height },
+          })}
+        >
+          {/* Main File Input */}
+          <input ref={ref} {...getInputProps()} />
+
+          <div className="flex flex-col items-center justify-center text-xs text-gray-400">
+            <UploadCloudIcon className="mb-2 h-7 w-7" />
+            {acceptedFiles[0] ? (
+              <div>
+                <p className="text-gray-600 dark:text-gray-200">
+                  {acceptedFiles[0].name} ({formatFileSize(acceptedFiles[0].size)})
+                </p>
+              </div>
+            ) : (
+              <div>
+                <div className="text-gray-400">drag & drop to upload</div>
+                <div className="mt-3">
+                  <Button type="button" disabled={disabled}>
+                    select
+                  </Button>
                 </div>
               </div>
-            </div>
-
-            {/* Error Text */}
-            <div className="mt-1 text-xs text-red-500">
-              {customError ?? errorMessage}
-            </div>
+            )}
           </div>
 
-          {/* Selected Files */}
-          {value?.map(({ file, abortController, progress }, i) => (
+          {/* Remove File Icon */}
+          {acceptedFiles[0] && !disabled && (
             <div
-              key={i}
-              className="flex h-16 w-full flex-col justify-center rounded border border-gray-300 px-4 py-2"
+              className="group absolute right-0 top-0 -translate-y-1/4 translate-x-1/4 transform"
+              onClick={(e) => {
+                e.stopPropagation();
+                void onChange?.(undefined);
+              }}
             >
-              <div className="flex items-center gap-2 text-gray-500 dark:text-white">
-                <FileIcon size="30" className="shrink-0" />
-                <div className="min-w-0 text-sm">
-                  <div className="overflow-hidden overflow-ellipsis whitespace-nowrap">
-                    {file.name}
-                  </div>
-                  <div className="text-xs text-gray-400 dark:text-gray-400">
-                    {formatFileSize(file.size)}
-                  </div>
-                </div>
-                <div className="grow" />
-                <div className="flex w-12 justify-end text-xs">
-                  {progress === 'PENDING' ? (
-                    <button
-                      type="button"
-                      className="rounded-md p-1 transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                      onClick={() => {
-                        void onChange?.(
-                          value.filter((_, index) => index !== i),
-                        );
-                      }}
-                    >
-                      <Trash2Icon className="shrink-0" />
-                    </button>
-                  ) : progress === 'ERROR' ? (
-                    <LucideFileWarning className="shrink-0 text-red-600 dark:text-red-400" />
-                  ) : progress !== 'COMPLETE' ? (
-                    <div className="flex flex-col items-end gap-0.5">
-                      {abortController && (
-                        <button
-                          type="button"
-                          className="rounded-md p-0.5 transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                          disabled={progress === 100}
-                          onClick={() => {
-                            abortController.abort();
-                          }}
-                        >
-                          <XIcon className="h-4 w-4 shrink-0 text-gray-400 dark:text-gray-400" />
-                        </button>
-                      )}
-                      <div>{Math.round(progress)}%</div>
-                    </div>
-                  ) : (
-                    <CheckCircleIcon className="shrink-0 text-green-600 dark:text-gray-400" />
-                  )}
-                </div>
+              <div className="flex h-5 w-5 items-center justify-center rounded-md border border-solid border-gray-500 bg-white transition-all duration-300 hover:h-6 hover:w-6 dark:border-gray-400 dark:bg-black">
+                <X className="text-gray-500 dark:text-gray-400" width={16} height={16} />
               </div>
-              {/* Progress Bar */}
-              {typeof progress === 'number' && (
-                <div className="relative h-0">
-                  <div className="absolute top-1 h-1 w-full overflow-clip rounded-full bg-gray-200 dark:bg-gray-700">
-                    <div
-                      className="h-full bg-gray-400 transition-all duration-300 ease-in-out dark:bg-white"
-                      style={{
-                        width: progress ? `${progress}%` : '0%',
-                      }}
-                    />
-                  </div>
-                </div>
-              )}
             </div>
-          ))}
+          )}
         </div>
+
+        {/* Error Text */}
+        {errorMessage && <div className="mt-1 text-xs text-red-500">{errorMessage}</div>}
       </div>
     );
   },
 );
-MultiFileDropzone.displayName = 'MultiFileDropzone';
+SingleFileDropzone.displayName = 'SingleFileDropzone';
 
-export { MultiFileDropzone };
+export { SingleFileDropzone };
