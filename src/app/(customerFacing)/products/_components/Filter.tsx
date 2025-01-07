@@ -32,7 +32,7 @@ export default function Filter({ onFilterSelect }: FilterProps) {
   };
 
   return (
-    <div className="flex flex-col">
+      <div className="hamburger">
       {/* Hamburger Menu Icon */}
       <button
         type="button"
@@ -53,7 +53,6 @@ export default function Filter({ onFilterSelect }: FilterProps) {
           />
         </svg>
       </button>
-
       {/* Always rendered. Toggling .open or .closed lets CSS handle the animation */}
       <div className={`menuContainer ${menuOpen ? "open" : "closed"}`}>
         <MenuItems onClickItem={handleItemClick} />

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import ProductsSearch from "./searchBar";
+import ProductsSearch from "./SearchBar";
 import Filter from "./Filter";
 
 
