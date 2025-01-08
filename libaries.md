@@ -1,4 +1,5 @@
 
 Prisma for backend sql
 Zod for validation
-stripe server
+stripe for payment validation
+EdgeStore for file upload and storage

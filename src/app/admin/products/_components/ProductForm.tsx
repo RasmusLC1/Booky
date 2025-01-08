@@ -13,6 +13,8 @@ import { Product } from "@prisma/client";
 import { SingleImageDropzone } from "@/components/ImageUpload";
 import { SingleFileDropzone } from "@/components/FileUpload";
 import { startTransition } from "react";
+import { PageHeader } from "../../_components/PageHeader";
+
 
 interface ProductFormProps {
   product?: Product | null;
@@ -20,9 +22,7 @@ interface ProductFormProps {
 
 export function ProductForm({ product }: ProductFormProps) {
   // Determine the action function based on whether we have a product or not
-  const actionFn = product
-    ? updateProduct.bind(null, product.id)
-    : addProduct;
+  const actionFn = product ? updateProduct.bind(null, product.id) : addProduct;
 
   // Initialize action state
   const [error, action] = useActionState(actionFn, {});
@@ -31,29 +31,32 @@ export function ProductForm({ product }: ProductFormProps) {
   const [priceInCents, setPriceInCents] = useState<number | undefined>(
     product?.priceInCents
   );
-  const [file, setFile] = useState<File | null>(null);
-  const [image, setImage] = useState<File | null>(null);
+  const [file, setFile] = useState<File | undefined>();
+  const [image, setImage] = useState<File | undefined>();
 
   // Handle form submission
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-  
+
+    // Create a FormData object to submit all fields
     const formData = new FormData(event.currentTarget as HTMLFormElement);
-  
+
+    // Append file and image if they are uploaded
     if (file) formData.append("file", file);
     if (image) formData.append("image", image);
-  
+
+    // Use startTransition to handle the action function call
     startTransition(() => {
-      action(formData).then((errors) => {
-        if (errors) {
-          console.error("Form submission errors:", errors);
-        }
-      });
+      action(formData); // No .then() needed
     });
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+    <form onSubmit={handleSubmit} className="space-y-8 bg-white p-10 rounded-lg shadow-lg w-full max-w-md">
+    {/* Header */}
+    <PageHeader>Add Product</PageHeader>
+    
       {/* Name Field */}
       <div className="space-y-2">
         <Label htmlFor="name">Name</Label>
@@ -96,7 +99,9 @@ export function ProductForm({ product }: ProductFormProps) {
           required
           defaultValue={product?.category || ""}
         />
-        {error?.category && <div className="text-destructive">{error.category}</div>}
+        {error?.category && (
+          <div className="text-destructive">{error.category}</div>
+        )}
       </div>
 
       {/* Description Field */}
@@ -119,7 +124,7 @@ export function ProductForm({ product }: ProductFormProps) {
         <SingleFileDropzone
           width={200}
           height={200}
-          value={file}
+          value={file ?? undefined}
           onChange={(file) => setFile(file)}
         />
         {file && <div className="text-muted-foreground">{file.name}</div>}
@@ -131,7 +136,7 @@ export function ProductForm({ product }: ProductFormProps) {
         <SingleImageDropzone
           width={200}
           height={200}
-          value={image}
+          value={image ?? undefined} // Ensure it's never null
           onChange={(file) => setImage(file)}
         />
         {image && <div className="text-muted-foreground">{image.name}</div>}
@@ -139,6 +144,7 @@ export function ProductForm({ product }: ProductFormProps) {
 
       <SubmitButton />
     </form>
+    </div>
   );
 }
 

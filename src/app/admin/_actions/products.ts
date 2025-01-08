@@ -5,6 +5,8 @@ import db from "@/db/db";
 import fs from "fs/promises";
 import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import sanitizeHtml from "sanitize-html";
+
 
 const fileSchema = z.instanceof(File, { message: "Required" }); // Ensure that the file schema is instance of File
 
@@ -28,6 +30,10 @@ export async function addProduct(prevState: unknown, formData: FormData) {
     return result.error.formErrors.fieldErrors;
   }
   const data = result.data;
+
+  data.name = sanitizeHtml(data.name);
+  data.description = sanitizeHtml(data.description);
+  data.category = sanitizeHtml(data.category);
 
   // Handle multiple requests recursively
   await fs.mkdir("products", { recursive: true });

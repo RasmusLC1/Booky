@@ -5,6 +5,8 @@ import { UploadCloudIcon, X } from 'lucide-react';
 import * as React from 'react';
 import { useDropzone, type DropzoneOptions } from 'react-dropzone';
 import { twMerge } from 'tailwind-merge';
+import { Button } from './ui/button';
+
 
 const variants = {
   base: 'relative rounded-md flex justify-center items-center flex-col cursor-pointer min-h-[150px] min-w-[200px] border border-dashed border-gray-400 dark:border-gray-300 transition-colors duration-200 ease-in-out',
@@ -154,24 +156,7 @@ const SingleImageDropzone = React.forwardRef<HTMLInputElement, InputProps>(
             </div>
           )}
 
-          {/* Remove Image Icon */}
-          {imageUrl && !disabled && (
-            <div
-              className="group absolute right-0 top-0 -translate-y-1/4 translate-x-1/4 transform"
-              onClick={(e) => {
-                e.stopPropagation();
-                void onChange?.(undefined);
-              }}
-            >
-              <div className="flex h-5 w-5 items-center justify-center rounded-md border border-solid border-gray-500 bg-white transition-all duration-300 hover:h-6 hover:w-6 dark:border-gray-400 dark:bg-black">
-                <X
-                  className="text-gray-500 dark:text-gray-400"
-                  width={16}
-                  height={16}
-                />
-              </div>
-            </div>
-          )}
+          
         </div>
 
         {/* Error Text */}
@@ -182,26 +167,6 @@ const SingleImageDropzone = React.forwardRef<HTMLInputElement, InputProps>(
 );
 SingleImageDropzone.displayName = 'SingleImageDropzone';
 
-const Button = React.forwardRef<
-  HTMLButtonElement,
-  React.ButtonHTMLAttributes<HTMLButtonElement>
->(({ className, ...props }, ref) => {
-  return (
-    <button
-      className={twMerge(
-        // base
-        'focus-visible:ring-ring inline-flex cursor-pointer items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50',
-        // color
-        'border border-gray-400 text-gray-400 shadow hover:bg-gray-100 hover:text-gray-500 dark:border-gray-600 dark:text-gray-100 dark:hover:bg-gray-700',
-        // size
-        'h-6 rounded-md px-2 text-xs',
-        className,
-      )}
-      ref={ref}
-      {...props}
-    />
-  );
-});
-Button.displayName = 'Button';
+
 
 export { SingleImageDropzone };
