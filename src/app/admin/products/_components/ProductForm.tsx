@@ -52,7 +52,7 @@ export function ProductForm({ product }: ProductFormProps) {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+    <div className="flex items-center justify-center h-screen w-screen bg-gray-50">
     <form onSubmit={handleSubmit} className="space-y-8 bg-white p-10 rounded-lg shadow-lg w-full max-w-md">
     {/* Header */}
     <PageHeader>Add Product</PageHeader>

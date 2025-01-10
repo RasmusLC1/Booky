@@ -23,6 +23,8 @@ async function getUsers() {
     select: {
         id: true,
         email: true,
+        username: true,
+        password: true,
         orders: {select: {priceInCents: true}},
         },
         orderBy: {createdAt: "desc"}
@@ -49,6 +51,8 @@ async function UsersTable(){
             <TableHeader>
                 <TableRow>
                     <TableHead>Email</TableHead>
+                    <TableHead>Username</TableHead>
+                    <TableHead>Password</TableHead>
                     <TableHead>Orders</TableHead>
                     <TableHead>Value</TableHead>
                     <TableHead className="w-0">
@@ -60,6 +64,8 @@ async function UsersTable(){
                 {users.map(user => (
                     <TableRow key = {user.id}>
                         <TableCell>{user.email}</TableCell>
+                        <TableCell>{user.username}</TableCell>
+                        <TableCell>{user.password}</TableCell>
                         <TableCell>{formatNumber(user.orders.length)}</TableCell>
                         <TableCell>{formatCurrency(user.orders.reduce((sum, o) => o.priceInCents + sum, 0) / 100)}</TableCell>
                         <TableCell className="text-center">

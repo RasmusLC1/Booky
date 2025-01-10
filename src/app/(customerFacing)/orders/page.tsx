@@ -1,5 +1,6 @@
 "use client"
 
+import { FormEvent, useState } from "react"
 import { emailOrderHistory } from "@/actions/orders"
 import { Button } from "@/components/ui/button"
 import {
@@ -12,38 +13,65 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useFormState, useFormStatus } from "react-dom"
 
 export default function MyOrdersPage() {
-  const [data, action] = useFormState(emailOrderHistory, {})
+  const [pending, setPending] = useState(false)
+  const [error, setError] = useState("")
+  const [message, setMessage] = useState("")
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+
+    setPending(true)
+    setError("")
+    setMessage("")
+
+    const formData = new FormData(e.currentTarget)
+
+    try {
+      const result = await emailOrderHistory(null, formData)
+      if (result.error) {
+        setError(result.error)
+      } else {
+        setMessage(result.message || "")
+      }
+    } catch (err) {
+      setError("Something went wrong. Please try again.")
+    } finally {
+      setPending(false)
+    }
+  }
+
   return (
-    <form action={action} className="max-2-xl mx-auto">
+    <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
       <Card>
         <CardHeader>
           <CardTitle>My Orders</CardTitle>
           <CardDescription>
             Enter your email and we will email you your order history and
-            download links
+            download links.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input type="email" required name="email" id="email" />
-            {data.error && <div className="text-destructive">{data.error}</div>}
+            {error && <div className="text-destructive">{error}</div>}
           </div>
         </CardContent>
         <CardFooter>
-          {data.message ? <p>{data.message}</p> : <SubmitButton />}
+          {message ? (
+            <p>{message}</p>
+          ) : (
+            <SubmitButton pending={pending} />
+          )}
         </CardFooter>
       </Card>
     </form>
   )
 }
 
-function SubmitButton() {
-  const { pending } = useFormStatus()
-
+function SubmitButton({ pending }: { pending: boolean }) {
   return (
     <Button className="w-full" size="lg" disabled={pending} type="submit">
       {pending ? "Sending..." : "Send"}
