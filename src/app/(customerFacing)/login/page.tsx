@@ -1,11 +1,14 @@
-import React from "react";
+"use client"
+
 import "./loginform.css";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import React, { useState } from "react"
 import Link from "next/link";
+import { Signin } from "./_actions/accountSignin";
 
-function google_logo() {
+function googleLogo() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -34,6 +37,28 @@ function google_logo() {
 }
 
 export default function Login() {
+  // Keep track of field-level errors in state
+  const [errors, setErrors] = useState<{
+    email?: string;
+    password?: string;
+  }>({});
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setErrors({}); // clear previous errors
+
+    const formData = new FormData(e.currentTarget);
+    const result = await Signin(formData);
+
+    // If the server returns field-level errors, store them so we can display
+    if (result?.error) {
+      setErrors(result.error);
+    } else if (result?.success) {
+      // Redirect or do something else upon success
+      window.location.href = "/";
+    }
+  }
+
   return (
     <main className="cover">
       <div className="box">
@@ -42,33 +67,48 @@ export default function Login() {
             <h1 className="text-3xl font-semibold">Login</h1>
           </div>
 
-          <form>
-            <Button className="google_button" variant="outline">
-              {google_logo()}
-              Sign in with Google
-            </Button>
+          <Button className="google_button" variant="outline">
+            {googleLogo()}
+            Sign in with Google
+          </Button>
+
+          <form onSubmit={handleSubmit}>
             <Label htmlFor="email">Email*</Label>
             <Input
               className="input"
               type="email"
+              name="email"
               id="email"
               placeholder="Email"
-            ></Input>
+              required
+            />
+            {errors.email && (
+              <p className="text-red-500">{errors.email}</p>
+            )}
+
             <Label htmlFor="password">Password*</Label>
             <Input
               className="input"
               type="password"
+              name="password"
               id="password"
-              placeholder="password"
-            ></Input>
+              placeholder="Password"
+              required
+            />
+            {errors.password && (
+              <p className="text-red-500">{errors.password}</p>
+            )}
 
             <Button type="submit" className="submit_button">
               Login
             </Button>
             <Link href="/signup" passHref>
-              <Button type="submit" className="submit_button">Registrer</Button>
+              <Button type="button" className="submit_button">
+                Register
+              </Button>
             </Link>
           </form>
+
           <p className="mt-4 text-xs text-slate-400">
             @2025 All rights reserved
           </p>
