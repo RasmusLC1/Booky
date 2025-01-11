@@ -10,7 +10,7 @@ const loginSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
-export async function Signin(formData: FormData) {
+export async function loginVerification(formData: FormData) {
   // 1) Validate
   const result = loginSchema.safeParse({
     email: formData.get("email"),

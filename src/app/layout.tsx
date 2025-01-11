@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { EdgeStoreProvider } from '@/lib/edgestore'
+import { getServerSession } from "next-auth";
+import SessionProvider from "./components/SessionProvider"
 import "./globals.css";
 
 const geistSans = localFont({
@@ -19,18 +21,22 @@ export const metadata: Metadata = {
   description: "One Stop Book Shop",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+  const session = await getServerSession();
+
   return (
     <html lang="en">
       <body
         suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <EdgeStoreProvider>{children}</EdgeStoreProvider>
+        {/* Makes the sesion available to any client component and the edgestore as well*/}
+        <SessionProvider session={session}><EdgeStoreProvider>{children}</EdgeStoreProvider></SessionProvider>
       </body>
     </html>
   );

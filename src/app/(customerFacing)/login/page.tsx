@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import React, { useState } from "react"
 import Link from "next/link";
-import { Signin } from "./_actions/accountSignin";
+import { loginVerification } from "./_actions/accountSignin";
 
 function googleLogo() {
   return (
@@ -48,7 +48,7 @@ export default function Login() {
     setErrors({}); // clear previous errors
 
     const formData = new FormData(e.currentTarget);
-    const result = await Signin(formData);
+    const result = await loginVerification(formData);
 
     // If the server returns field-level errors, store them so we can display
     if (result?.error) {
