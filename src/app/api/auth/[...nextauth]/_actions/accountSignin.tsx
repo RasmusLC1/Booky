@@ -32,7 +32,7 @@ export async function loginVerification(formData: FormData) {
   };
 
   // 3. Check if user exists
-  const existingUser = await db.user.findUnique({
+  const existingUser = await db.user.findFirst({
     where: { email: data.email },
   });
   if (!existingUser) {

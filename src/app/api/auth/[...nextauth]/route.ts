@@ -5,6 +5,7 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import GitHubProvider from "next-auth/providers/github"
 import GoogleProvider from "next-auth/providers/google"
 import { loginVerification } from "./_actions/accountSignin"
+import { createAccountIfNeeded } from "./_actions/createAccountIfNeeded"
 
 export const authOptions = {
   providers: [
@@ -27,7 +28,7 @@ export const authOptions = {
         email: {
           label: "Email",
           type: "text",
-          placeholder: "jsmith@example.com",
+          placeholder: "placeholder@example.com",
         },
         password: {
           label: "Password",
@@ -60,7 +61,20 @@ export const authOptions = {
   session: {
     strategy: "jwt", // or "database" or "session" if you prefer
   },
-  // ...
+  // 3. signIn callback
+  callbacks: {
+    async signIn({ user}) {
+      try {
+        // If user is valid, optionally create the account
+        // in DB if it doesn’t exist.
+        await createAccountIfNeeded(user);
+        return true; // allow sign-in
+      } catch (error) {
+        console.error("Error creating user account after signIn:", error);
+        return false; // reject sign-in
+      }
+    },
+  },
 }
 
 const handler = NextAuth(authOptions)
