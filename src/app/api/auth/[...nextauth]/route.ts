@@ -3,15 +3,22 @@
 import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import GitHubProvider from "next-auth/providers/github"
+import GoogleProvider from "next-auth/providers/google"
 import { loginVerification } from "./_actions/accountSignin"
 
 export const authOptions = {
   providers: [
-    // Example: GitHub OAuth
+    // GitHub OAuth
     GitHubProvider({
       clientId: process.env.GITHUB_ID ?? "",
       clientSecret: process.env.GITHUB_SECRET ?? "",
     }),
+
+    // Google OAuth
+    GoogleProvider({
+        clientId: process.env.GOOGLE_ID ?? "",
+        clientSecret: process.env.GOOGLE_SECRET ?? "",
+      }),
 
     // Your custom email/password Credentials
     CredentialsProvider({

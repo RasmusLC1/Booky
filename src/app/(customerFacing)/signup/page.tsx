@@ -16,7 +16,7 @@ export default function SignUp() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setErrors({}) // Clear previous errors
-
+    
     const formData = new FormData(e.currentTarget)
     const result = await addUser(formData)
 
