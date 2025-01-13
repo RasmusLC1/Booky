@@ -1,58 +1,20 @@
-.cover {
-    display: flex;          /* flex */
-    padding: 2.5rem;        /* p-10 */
-}
+/* loginform.css */
 
+.cover {
+  display: flex;
+  justify-content: center;
+}
 
 .box {
-    display: grid;            /* grid */
-    width: 100%;              /* w-full */
-    height: 100%;             /* h-full */
-    grid-template-columns: 1fr; /* grid-cols-1 */
-    background-color: black;  /* bg-black */
-  }
-  
-  @media (min-width: 768px) { /* md:grid-cols-2 */
-    .container {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  .textfield {
-    background-color: white;  /* bg-white */
-    color: black;             /* text-black */
-    display: flex;            /* flex */
-    align-items: center;      /* items-center */
-    justify-content: center;  /* justify-center */
-    flex-direction: column;   /* flex-col */
-  }
-
-  .google_button {
-    display: flex;            /* flex */
-    align-items: center;      /* items-center */
-    width: 100%;              /* w-full */
-    gap: 1rem;                /* gap-4 */
-    padding-left: 3rem;       /* px-12 */
-    padding-right: 3rem;      /* px-12 */
-    background-color: transparent; /* bg-transparent */
-    border-radius: 9999px;    /* rounded-full */
-  }
-
-  .input {
-    margin-top: 0.5rem;        /* mt-2 */
-    margin-bottom: 1rem;       /* mb-4 */
-    background-color: transparent; /* bg-transparent */
-    border-radius: 9999px;     /* rounded-full */ 
+  width: 400px;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* optional shadow */
+  background-color: #fff; /* optional background for the box */
 }
 
-.submit_button {
-    width: 100%;                   /* w-full */
-    margin-top: 1.5rem;            /* mt-6 */
-    background-color: black;        /* bg-grey (use your desired shade) */
-    border-radius: 9999px;         /* rounded-full */
-    transition: background-color 0.3s ease;  /* Smooth transition for hover effect */
-  }
-  
-  .submit_button:hover {
-    background-color: grey;       /* hover:bg-black */
-  }
+.textfield {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
