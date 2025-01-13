@@ -1,70 +1,71 @@
-"use server"
+"use server";
 
-import { z } from "zod"
-import db from "@/db/db"
-import sanitizeHtml from "sanitize-html"
-import { createHash } from "crypto"
+import { z } from "zod";
+import db from "@/db/db";
+import bcrypt from "bcrypt";
 import { SendAccountCreationEmail } from "./accontCreationEmail"
 
-
+// Validation schema
 const addSchema = z.object({
-  email: z.string().min(1, "Email is required"),
+  email: z.string().email("Invalid email format").min(1, "Email is required"),
   username: z.string().min(1, "Username is required"),
-  password: z.string().min(1, "Password is required"),
-})
+  password: z.string().min(8, "Password must be at least 8 characters"),
+});
 
 export async function addUser(formData: FormData) {
-  // 1. Validate
+  // 1. Validate input
   const result = addSchema.safeParse({
     email: formData.get("email"),
     username: formData.get("username"),
     password: formData.get("password"),
-  })
+  });
 
-  // 2. Return field-specific errors if validation fails
   if (!result.success) {
-    const fieldErrors: Record<string, string> = {}
+    const fieldErrors: Record<string, string> = {};
     for (const issue of result.error.issues) {
-      fieldErrors[issue.path[0]] = issue.message
+      fieldErrors[issue.path[0]] = issue.message;
     }
-    return { error: fieldErrors } // No redirect, just return
+    return { error: fieldErrors };
   }
 
-  // 3. Sanitize
+  // 2. Sanitize data
   const data = {
-    email: sanitizeHtml(result.data.email.toLowerCase()),
-    username: sanitizeHtml(result.data.username.toLowerCase()),
-    password: sanitizeHtml(result.data.password),
-  }
+    email: result.data.email.toLowerCase(),
+    username: result.data.username.toLowerCase(),
+    password: result.data.password,
+  };
 
-
-
-  // 4. Check if user already exists
+  // 3. Check if user already exists
   const existingUser = await db.user.findFirst({
     where: {
       OR: [{ email: data.email }, { username: data.username }],
     },
-  })
+  });
   if (existingUser) {
-    // Return a field-level error for each conflict
     return {
       error: {
         email: existingUser.email === data.email ? "Email is already in use" : "",
         username: existingUser.username === data.username ? "Username is already in use" : "",
       },
-    }
+    };
   }
 
-  // 5. Hash password & create new user
-  data.password = createHash("sha256").update(data.password).digest("hex")
-  await db.user.create({ data })
+  // 4. Hash password
+  const hashedPassword = await bcrypt.hash(data.password, 12);
 
-  // 6. Call your email action
-  const emailFormData = new FormData()
-  emailFormData.append("email", data.email)
-  await SendAccountCreationEmail(emailFormData)
-  
-  // 6. Return success or redirect
-  // Return something so the client knows we're good:
-  return { success: true }
+  // 5. Store user in database
+  await db.user.create({
+    data: {
+      email: data.email,
+      username: data.username,
+      password: hashedPassword,
+    },
+  });
+
+  // 6. Send confirmation email
+  const emailFormData = new FormData();
+  emailFormData.append("email", data.email);
+  await SendAccountCreationEmail(emailFormData);
+
+  return { success: true };
 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isValidPassword } from "./lib/isValidPassword";
+import { isValidPassword } from "../../lib/isValidPassword";
 
 // Uses browser authentication to sign in
 export async function middleware(req: NextRequest) {
