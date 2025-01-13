@@ -7,22 +7,8 @@ import { randomBytes } from "crypto";
 import bcrypt from "bcrypt";
 
 
-function generateRandomPassword(length = 32): string {
-    // Adjust the charset to your liking (symbols, etc.)
-    const charset =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?";
-    let password = "";
-  
-    // Generate random bytes
-    const bytes = randomBytes(length);
-  
-    // Map each random byte to a character from charset
-    for (let i = 0; i < length; i++) {
-      const randomIndex = bytes[i] % charset.length;
-      password += charset.charAt(randomIndex);
-    }
-  
-    return password;
+function generateRandomPassword(): string {
+    return randomBytes(32).toString("hex"); // 64-character hex string
   }
 /**
  * Creates a new user record if one doesn't already exist for the given email.
@@ -47,13 +33,9 @@ export async function createAccountIfNeeded(
     return;
   }
 
-  // Generate a random password
-  const randomPassword = generateRandomPassword();
-  console.log("RANDOM PASSWORD", randomPassword);
 
-  // Hash the random password with a salt (cost factor)
-  const saltRounds = 10; // Adjust this value based on your security and performance needs
-  const randomHashedPassword = await bcrypt.hash(randomPassword, 12);
+  // Hash a random password with a salt factor
+  const randomHashedPassword = await bcrypt.hash(generateRandomPassword(), 12);
 
   // 3. If user does not exist, create a new record
   await db.user.create({

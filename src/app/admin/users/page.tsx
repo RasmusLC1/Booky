@@ -52,6 +52,7 @@ async function UsersTable(){
                 <TableRow>
                     <TableHead>Email</TableHead>
                     <TableHead>Username</TableHead>
+                    <TableHead>Password</TableHead>
                     <TableHead>Orders</TableHead>
                     <TableHead>Value</TableHead>
                     <TableHead className="w-0">
@@ -64,6 +65,7 @@ async function UsersTable(){
                     <TableRow key = {user.id}>
                         <TableCell>{user.email}</TableCell>
                         <TableCell>{user.username}</TableCell>
+                        <TableCell>{user.password}</TableCell>
                         <TableCell>{formatNumber(user.orders.length)}</TableCell>
                         <TableCell>{formatCurrency(user.orders.reduce((sum, o) => o.priceInCents + sum, 0) / 100)}</TableCell>
                         <TableCell className="text-center">

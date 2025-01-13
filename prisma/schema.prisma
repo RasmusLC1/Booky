@@ -29,13 +29,14 @@ model Product {
 }
 
 model User {
-  id        String   @id @default(uuid()) // User id
-  email     String   @unique // Ensure only one of each email
-  username  String   @unique // Ensure only one of each username
-  password  String
-  createdAt DateTime @default(now()) // Time the link was created
-  updatedAt DateTime @updatedAt
-  orders    Order[]
+  id             String          @id @default(uuid()) // User id
+  email          String          @unique // Ensure only one of each email
+  username       String          @unique // Ensure only one of each username
+  password       String
+  createdAt      DateTime        @default(now()) // Time the link was created
+  updatedAt      DateTime        @updatedAt
+  orders         Order[]
+  passwordResets PasswordReset[]
 }
 
 model Order {
@@ -68,4 +69,12 @@ model DownloadVerification {
   createdAt DateTime @default(now()) // Time the link was created
   productid String
   product   Product  @relation(fields: [productid], references: [id], onDelete: Cascade)
+}
+
+model PasswordReset {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id])
 }

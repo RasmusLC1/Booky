@@ -24,7 +24,6 @@ export default function SignUp() {
     if (result?.error) {
       setErrors(result.error)
     } else if (result?.success) {
-      
       // Redirect or do something else upon success
       window.location.href = "/"
     }

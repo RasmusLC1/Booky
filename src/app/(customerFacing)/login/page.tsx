@@ -131,6 +131,12 @@ export default function Login() {
                 Register
               </Button>
             </Link>
+
+            <Link href="/requestpasswordreset" passHref>
+              <Button type="button" className="signup_button">
+                Reset Password
+              </Button>
+            </Link>
           </form>
 
           <p className="mt-4 text-xs text-slate-400">
