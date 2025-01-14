@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import db from "@/db/db";
 import { Prisma } from "@prisma/client";
 import { ProductCardSkeleton } from "@/components/ProductCard";
-import ProductsClient from "../products/_components/ProductsClient";
+import ProductsClient from "./_components/ProductsClient";
 
 // Type for User with Orders and Products
 type UserWithOrders = Prisma.UserGetPayload<{
@@ -87,7 +87,8 @@ async function ProductsSuspense({ session }: { session: any }) {
   );
 
   return (
-    <div>
+    <div suppressHydrationWarning>
+      
       <ProductsClient products={products} />
     </div>
   );

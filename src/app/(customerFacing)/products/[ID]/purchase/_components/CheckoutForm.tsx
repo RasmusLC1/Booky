@@ -21,6 +21,9 @@ import { loadStripe } from "@stripe/stripe-js";
 import { error } from "console";
 import Image from "next/image";
 import { FormEvent, useState } from "react";
+import "./banner.css"
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string);
 
 type CheckoutFormProps = {
   product: {
@@ -32,37 +35,30 @@ type CheckoutFormProps = {
   };
   clientSecret: string;
 };
-
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string
-);
-
 export function CheckoutForm({ product, clientSecret }: CheckoutFormProps) {
   return (
     <div className="max-w-5xl w-full mx-auto space-y-8">
+      {/* Demo Banner */}
+      <div className="demo-banner">
+        <p>
+          🚨 <strong>This is a demo site.</strong> The books contain random PDF data. To test a purchase, use the card number <strong>4242 4242 4242 4242</strong>, expiration date <strong>12/30</strong>, CVC <strong>325</strong>, and your email.
+        </p>
+      </div>
+
       <div className="flex gap-4 items-center">
         <div className="aspect-video flex-shrink-0 w-1/3 relative">
-          <Image
-            src={product.imagePath}
-            fill
-            alt={product.name}
-            className="object-cover"
-          />
+          <Image src={product.imagePath} fill alt={product.name} className="object-cover" />
         </div>
         <div>
-          <div className="text-lg">
-            {formatCurrency(product.priceInCents / 100)}
-          </div>
+          <div className="text-lg">{(product.priceInCents / 100).toFixed(2)} USD</div>
           <h1 className="text-2xl font-bold">{product.name}</h1>
-          <div className="line-clamp-3 text-muted-foreground">
-            {product.description}
-          </div>
+          <div className="line-clamp-3 text-muted-foreground">{product.description}</div>
         </div>
       </div>
+
       <Elements options={{ clientSecret }} stripe={stripePromise}>
         <Form priceInCents={product.priceInCents} productid={product.id} />
       </Elements>
-      ;
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ProductCard } from "@/components/ui/ProductCard";
+import { DownloadProduct } from "@/components/DownloadProductCard";
 
 type Product = {
     id: string;
@@ -21,11 +21,13 @@ interface ProductsSearchProps {
 export default function ProductsSearch({ products}: ProductsSearchProps) {
   const [query, setQuery] = useState("");
 
-   // Filter the products by `query`.
-   const filteredProducts = products.filter((product) =>
+  // Filter the products by `query`.
+  const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(query.toLowerCase()) ||
     product.author.toLowerCase().includes(query.toLowerCase()),
   );
+
+
 
   return (
     <div className="space-y-4"> 
@@ -33,7 +35,7 @@ export default function ProductsSearch({ products}: ProductsSearchProps) {
 
       {/* Search Section */}
       <div className="space-y-4">
-        <h2 className="text-2xl font-bold text-center">Search</h2>
+        <h2 className="text-2xl font-bold text-center">Search through your orders</h2>
 
         {/* Search Input */}
         <input
@@ -46,7 +48,7 @@ export default function ProductsSearch({ products}: ProductsSearchProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProducts.map((product) => (
-            <ProductCard key={product.id} {...product} />
+            <DownloadProduct key={product.id} {...product} />
           ))}
         </div>
       </div>

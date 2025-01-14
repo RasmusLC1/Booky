@@ -16,9 +16,10 @@ const imageSchema = fileSchema.refine(
 
 const addSchema = z.object({
   name: z.string().min(1),
+  author: z.string().min(1),
   description: z.string().min(1),
   category: z.string().min(1),
-  priceInCents: z.coerce.number().int().min(1),
+  priceInCents: z.coerce.number().int(),
   file: fileSchema.refine((file) => file.size > 0, "Required"),
   image: imageSchema.refine((file) => file.size > 0, "Required"),
 });
@@ -61,6 +62,7 @@ export async function addProduct(prevState: unknown, formData: FormData) {
       data: {
         isAvailabelForPurchase: false,
         name: data.name,
+        author: data.author,
         description: data.description,
         category: data.category,
         priceInCents: data.priceInCents,

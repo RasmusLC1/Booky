@@ -2,6 +2,7 @@
 CREATE TABLE "Product" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "name" TEXT NOT NULL,
+    "Author" TEXT NOT NULL,
     "priceInCents" INTEGER NOT NULL,
     "filePath" TEXT NOT NULL,
     "imagePath" TEXT NOT NULL,
@@ -56,6 +57,15 @@ CREATE TABLE "DownloadVerification" (
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "productid" TEXT NOT NULL,
     CONSTRAINT "DownloadVerification_productid_fkey" FOREIGN KEY ("productid") REFERENCES "Product" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "PasswordReset" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT NOT NULL,
+    "token" TEXT NOT NULL,
+    "expiresAt" DATETIME NOT NULL,
+    CONSTRAINT "PasswordReset_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateIndex

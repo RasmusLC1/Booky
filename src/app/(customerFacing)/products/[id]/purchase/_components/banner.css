@@ -1,0 +1,14 @@
+.demo-banner {
+  background-color: #ffeaea;
+  color: #b80000;
+  padding: 10px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 16px;
+  border-bottom: 2px solid #b80000;
+}
+
+.demo-banner p {
+  margin: 0;
+  line-height: 1.5;
+}

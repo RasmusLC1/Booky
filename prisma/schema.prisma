@@ -13,6 +13,7 @@ datasource db {
 model Product {
   id                     String                 @id @default(uuid()) // Create a product id
   name                   String // Name of the product
+  author                String
   priceInCents           Int // / Price computed in cents, Easy for stripe later down the road
   filePath               String // File for the purchased item
   imagePath              String // Path for the image

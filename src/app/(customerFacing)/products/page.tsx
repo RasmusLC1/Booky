@@ -7,7 +7,7 @@ import ProductsClient from "./_components/ProductsClient";
 
 export default function ProductsPage() {
   return (
-    <div>
+    <div suppressHydrationWarning>
       {/* {While function is waiting to load it loads 6 product card skeletons as placeholders} */}
       <Suspense
         fallback={
@@ -32,7 +32,7 @@ const getProducts = cache(() => {
     where: { isAvailabelForPurchase: true },
     orderBy: { name: "asc" },
   });
-}, ["/products", "getProducts"], {revalidate: 60 * 60 * 24})
+}, ["/products", "getProducts"], {revalidate: 60 * 60 * 6})
 
 
 async function ProductsSuspense() {

@@ -70,6 +70,20 @@ export function ProductForm({ product }: ProductFormProps) {
         {error?.name && <div className="text-destructive">{error.name}</div>}
       </div>
 
+      {/* Name Field */}
+      <div className="space-y-2">
+        <Label htmlFor="author">Author</Label>
+        <Input
+          type="text"
+          id="author"
+          name="author"
+          required
+          defaultValue={product?.name || ""}
+        />
+        {error?.name && <div className="text-destructive">{error.name}</div>}
+      </div>
+
+
       {/* Price Field */}
       <div className="space-y-2">
         <Label htmlFor="priceInCents">Price In Cents</Label>
