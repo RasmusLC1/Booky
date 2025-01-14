@@ -1,91 +1,94 @@
-// "use client"
+import React, { Suspense, cache } from "react";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+import db from "@/db/db";
+import { Prisma } from "@prisma/client";
+import { ProductCardSkeleton } from "@/components/ProductCard";
+import ProductsClient from "../products/_components/ProductsClient";
 
-import { FormEvent, useState } from "react"
-import { emailOrderHistory } from "@/actions/orders"
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { getServerSession } from "next-auth"
-import { redirect } from "next/navigation"
+// Type for User with Orders and Products
+type UserWithOrders = Prisma.UserGetPayload<{
+  include: {
+    orders: {
+      include: {
+        product: true;
+      };
+    };
+  };
+}>;
 
 export default async function MyOrdersPage() {
-  const session = await getServerSession()
-  if (!session || !session.user){
-    redirect("/login")
+  // 1. Check the user session
+  const session = await getServerSession();
+  if (!session || !session.user) {
+    redirect("/login");
   }
-  return(
-    <div>HELLO</div>
-  )
+
+  return (
+    <div>
+      <Suspense
+        fallback={
+          <>
+            <ProductCardSkeleton />
+            <ProductCardSkeleton />
+            <ProductCardSkeleton />
+            <ProductCardSkeleton />
+            <ProductCardSkeleton />
+            <ProductCardSkeleton />
+          </>
+        }
+      >
+        <ProductsSuspense session={session} />
+      </Suspense>
+    </div>
+  );
 }
 
-//   const [pending, setPending] = useState(false)
-//   const [error, setError] = useState("")
-//   const [message, setMessage] = useState("")
+const getOrders = cache(async (email: string): Promise<UserWithOrders["orders"]> => {
+  const user = await db.user.findUnique({
+    where: { email },
+    include: {
+      orders: {
+        include: {
+          product: true,
+        },
+      },
+    },
+  });
 
-//   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-//     e.preventDefault()
+  if (!user) {
+    return [];
+  }
 
-//     setPending(true)
-//     setError("")
-//     setMessage("")
+  const orders = await Promise.all(
+    user.orders.map(async (order) => {
+      const downloadVerification = await db.downloadVerification.create({
+        data: {
+          expiresAt: new Date(Date.now() + 24 * 1000 * 60 * 60),
+          productid: order.product.id,
+        },
+      });
 
-//     const formData = new FormData(e.currentTarget)
+      return {
+        ...order,
+        downloadVerificationId: downloadVerification.id,
+      };
+    })
+  );
 
-//     try {
-//       const result = await emailOrderHistory(null, formData)
-//       if (result.error) {
-//         setError(result.error)
-//       } else {
-//         setMessage(result.message || "")
-//       }
-//     } catch (err) {
-//       setError("Something went wrong. Please try again.")
-//     } finally {
-//       setPending(false)
-//     }
-//   }
+  return orders;
+});
 
-//   return (
-//     <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
-//       <Card>
-//         <CardHeader>
-//           <CardTitle>My Orders</CardTitle>
-//           <CardDescription>
-//             Enter your email and we will email you your order history and
-//             download links.
-//           </CardDescription>
-//         </CardHeader>
-//         <CardContent>
-//           <div className="space-y-2">
-//             <Label htmlFor="email">Email</Label>
-//             <Input type="email" required name="email" id="email" />
-//             {error && <div className="text-destructive">{error}</div>}
-//           </div>
-//         </CardContent>
-//         <CardFooter>
-//           {message ? (
-//             <p>{message}</p>
-//           ) : (
-//             <SubmitButton pending={pending} />
-//           )}
-//         </CardFooter>
-//       </Card>
-//     </form>
-//   )
-// }
+async function ProductsSuspense({ session }: { session: any }) {
+  const orders = await getOrders(session.user.email);
 
-// function SubmitButton({ pending }: { pending: boolean }) {
-//   return (
-//     <Button className="w-full" size="lg" disabled={pending} type="submit">
-//       {pending ? "Sending..." : "Send"}
-//     </Button>
-//   )
-// }
+  const products = Array.from(
+    new Map(orders.map((order) => [order.product.id, order.product])).values()
+  );
+
+  return (
+    <div>
+      <ProductsClient products={products} />
+    </div>
+  );
+}
