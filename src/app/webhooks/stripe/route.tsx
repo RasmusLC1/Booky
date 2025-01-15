@@ -19,10 +19,8 @@ export async function POST(req: NextRequest) {
     const productid = charge.metadata.productid
     const email = charge.billing_details.email
     const priceInCents = charge.amount
-    console.log("TESTTESTSETSTEST")
     const product = await db.product.findUnique({ where: { id: productid } })
     if (product == null || email == null) {
-      console.log("BAD REQUEST")
       return new NextResponse("Bad Request", { status: 400 })
     }
 
@@ -30,7 +28,6 @@ export async function POST(req: NextRequest) {
     const user = await db.user.findUnique({
       where: { email },
     })
-    console.log("USER", user)
     // 2. If user does NOT exist, return error
     if (!user) {
       console.log("USER DOES NOT EXISTS")
@@ -52,7 +49,6 @@ export async function POST(req: NextRequest) {
       data: userFields,
       select: { orders: { orderBy: { createdAt: "desc" }, take: 1 } },
     })
-    console.log("CREASTE DOWNLOAD LINK")
     // Create a download link
     const downloadVerification = await db.downloadVerification.create({
       data: {

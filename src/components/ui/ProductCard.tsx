@@ -10,6 +10,7 @@ import {
 import { Button } from "./button";
 import Link from "next/link";
 import Image from "next/image";
+import CreateOrder from "../CreateOrder";
 
 type ProductCardProps = {
   id: string;
@@ -28,6 +29,18 @@ export function ProductCard({
   priceInCents,
   imagePath,
 }: ProductCardProps) {
+
+  async function handleCreateOrder() {
+    console.log("HANDLE CREATE");
+    const response = await CreateOrder(id);
+
+    if (response.error) {
+      alert(`Error: ${response.error}`);
+    } else {
+      alert(response.message || "Order created successfully!");
+    }
+  }
+
   return (
     <Card className="flex overflow-hidden flex-col">
       <div className="relative w-full h-auto aspect-video">
@@ -41,6 +54,8 @@ export function ProductCard({
         <p className="line-clamp-4">{description}</p>
       </CardContent>
       <CardFooter>
+      <Button onClick={handleCreateOrder}>DEMO Add Order</Button>
+
         <Button asChild size="lg" className="w-full">
           <Link href={`/products/${id}/purchase`}>Purchase</Link>
         </Button>
