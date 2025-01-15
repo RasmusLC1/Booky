@@ -5,8 +5,11 @@ import fs from "fs/promises";
 
 export async function GET(
   req: NextRequest,
-  { params: { id } }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  // Await the params to resolve it
+  const { id } = await context.params;
+
   // Select the filepath and name based on id
   const product = await db.product.findUnique({
     where: { id },
@@ -22,7 +25,7 @@ export async function GET(
   // Handle the server response for downloading the file
   return new NextResponse(file, {
     headers: {
-      "Content-Disposition": `attackment; filename="${product.name}.${extension}"`,
+      "Content-Disposition": `attachment; filename="${product.name}.${extension}"`,
       "Content-Length": size.toString(),
     },
   });

@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { Ratelimit } from "@upstash/ratelimit";
-import { redis } from "@upstash/redis";
+import { Redis } from "@upstash/redis";
+
+// Create a Redis instance using environment variables
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
 
 // Create a rate limiter using a sliding window algorithm
 const ratelimit = new Ratelimit({
@@ -10,8 +16,10 @@ const ratelimit = new Ratelimit({
 
 // Middleware to handle rate limiting
 export async function middleware(request: Request) {
-  // Use `request.ip` for a more reliable IP address
-  const ip = request.ip || request.headers.get("x-forwarded-for") || "127.0.0.1";
+  // Extract the IP address from the `x-forwarded-for` header
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    "127.0.0.1";
 
   // Check the rate limit for this IP
   const { success } = await ratelimit.limit(ip);
@@ -33,6 +41,7 @@ export async function middleware(request: Request) {
   return NextResponse.next();
 }
 
+// Apply this middleware to specific routes
 export const config = {
   matcher: ["/login", "/signup", "/api/:path*"], // Apply to sensitive routes
 };

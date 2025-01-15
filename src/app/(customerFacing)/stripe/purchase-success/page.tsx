@@ -11,21 +11,26 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 export default async function SuccessPage({
   searchParams,
 }: {
-  searchParams: { payment_intent: string };
+  searchParams: Promise<{ payment_intent: string }>;
 }) {
-  const params = await searchParams
+  // Await searchParams before accessing payment_intent
+  const params = await searchParams;
+
+  // Retrieve payment intent from Stripe
   const paymentIntent = await stripe.paymentIntents.retrieve(
     params.payment_intent
   );
 
   if (paymentIntent.metadata.productid == null) return notFound();
 
+  // Fetch product from the database
   const product = await db.product.findUnique({
     where: { id: paymentIntent.metadata.productid },
   });
 
   if (product == null) return notFound();
 
+  // Check payment success status
   const isSuccess = paymentIntent.status === "succeeded";
 
   return (
@@ -53,14 +58,14 @@ export default async function SuccessPage({
           <Button className="mt-4" size="lg" asChild>
             {isSuccess ? (
               <a
-              href={`/products/download/${await createDownloadVerification(
-                product.id
-              )}`}
+                href={`/products/download/${await createDownloadVerification(
+                  product.id
+                )}`}
               >
                 Download
               </a>
             ) : (
-              <Link href={`/products/${product.id}/purchase`}> Try Again </Link>
+              <Link href={`/products/${product.id}/purchase`}>Try Again</Link>
             )}
           </Button>
         </div>
@@ -71,13 +76,13 @@ export default async function SuccessPage({
 
 // Expire link after 24 hours
 async function createDownloadVerification(productid: string) {
-    const millisecondsInDay = 1000 * 60 * 60 * 24
-    return (
-      await db.downloadVerification.create({
-        data: {
-          productid,
-          expiresAt: new Date(Date.now() + millisecondsInDay),
-        },
-      })
-    ).id
-  }
+  const millisecondsInDay = 1000 * 60 * 60 * 24;
+  return (
+    await db.downloadVerification.create({
+      data: {
+        productid,
+        expiresAt: new Date(Date.now() + millisecondsInDay),
+      },
+    })
+  ).id;
+}
