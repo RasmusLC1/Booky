@@ -9,10 +9,10 @@ import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 export function ActiveToggleDropdownItem({
   id,
-  isAvailabelForPurchase,
+  isAvailableForPurchase,
 }: {
   id: string;
-  isAvailabelForPurchase: boolean;
+  isAvailableForPurchase: boolean;
 }) {
   const [, startTransition] = useTransition();
 
@@ -22,13 +22,13 @@ export function ActiveToggleDropdownItem({
     <DropdownMenuItem
       onClick={() => {
         startTransition(async () => {
-          await toggleProductAvailability(id, !isAvailabelForPurchase);
+          await toggleProductAvailability(id, !isAvailableForPurchase);
           router.refresh() // Refreshes the page when triggered
 
         });
       }}
     >
-      {isAvailabelForPurchase ? "Deactive" : "Activate"}
+      {isAvailableForPurchase ? "Deactive" : "Activate"}
     </DropdownMenuItem>
   );
 }

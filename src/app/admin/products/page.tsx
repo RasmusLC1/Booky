@@ -46,7 +46,7 @@ async function ProductsTable() {
       id: true,
       name: true,
       priceInCents: true,
-      isAvailabelForPurchase: true,
+      isAvailableForPurchase: true,
       _count: { select: { orders: true } },
     },
     orderBy: { name: "asc" },
@@ -73,7 +73,7 @@ async function ProductsTable() {
         {products.map((product) => (
           <TableRow key={product.id}>
             <TableCell>
-              {product.isAvailabelForPurchase ? (
+              {product.isAvailableForPurchase ? (
                 <>
                   <span className="sr-only">Available</span>
                   <CheckCircle2 />
@@ -107,7 +107,7 @@ async function ProductsTable() {
                   </DropdownMenuItem>
                   <ActiveToggleDropdownItem
                     id={product.id}
-                    isAvailabelForPurchase={product.isAvailabelForPurchase}
+                    isAvailableForPurchase={product.isAvailableForPurchase}
                   />
                   <DropdownMenuSeparator />
                   <DeleteDropdownItem

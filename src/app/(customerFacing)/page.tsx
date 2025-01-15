@@ -12,19 +12,19 @@ import {cache} from "@/lib/cache"
 // Shows the first 3
 const getMostPopularProducts = cache(() => {
   return db.product.findMany({
-    where: { isAvailabelForPurchase: true },
+    where: { isAvailableForPurchase: true },
     orderBy: { orders: { _count: "desc" } },
     take: 3,
   });
-}, ["/", "getMostPopularProducts"], {revalidate: 60 * 60 * 6}) // homepage so just / and name for that section of the page, refresh every 24 hours
+}, ["/", "getMostPopularProducts"], {revalidate: 60 * 60 * 2}) // homepage so just / and name for that section of the page, refresh every 24 hours
 
 const getNewestProducts = cache(() => {
   return db.product.findMany({
-    where: { isAvailabelForPurchase: true },
+    where: { isAvailableForPurchase: true },
     orderBy: { createdAt: "desc" },
     take: 3,
   });
-}, ["/", "getNewestProducts"], {revalidate: 60 * 60 * 6})
+}, ["/", "getNewestProducts"], {revalidate: 60 * 60 * 2})
 
 export default function HomePage() {
   return (

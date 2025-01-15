@@ -29,10 +29,10 @@ export default function ProductsPage() {
 
 const getProducts = cache(() => {
   return db.product.findMany({
-    where: { isAvailabelForPurchase: true },
+    where: { isAvailableForPurchase: true },
     orderBy: { name: "asc" },
   });
-}, ["/products", "getProducts"], {revalidate: 60 * 60 * 6})
+}, ["/products", "getProducts"], {revalidate: 60 * 60 * 2})
 
 
 async function ProductsSuspense() {
