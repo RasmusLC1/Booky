@@ -20,9 +20,11 @@ import {
 import { loadStripe } from "@stripe/stripe-js";
 import Image from "next/image";
 import { FormEvent, useState } from "react";
-import "./banner.css"
+import "./banner.css";
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string);
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string
+);
 
 type CheckoutFormProps = {
   product: {
@@ -40,18 +42,31 @@ export function CheckoutForm({ product, clientSecret }: CheckoutFormProps) {
       {/* Demo Banner */}
       <div className="demo-banner">
         <p>
-          🚨 <strong>This is a demo site.</strong> The books contain random PDF data. I don't have a live Stripe API key. To add order go back to products and press the <strong>Demo Add Order</strong> Button  .
+          <p>
+            🚨 <strong>This is a demo site.</strong> The books contain random
+            PDF data. I don&apos;t have a live Stripe API key. To add order, go
+            back to products and press the Demo Add Order Button.
+          </p>
         </p>
       </div>
 
       <div className="flex gap-4 items-center">
         <div className="aspect-video flex-shrink-0 w-1/3 relative">
-          <Image src={product.imagePath} fill alt={product.name} className="object-cover" />
+          <Image
+            src={product.imagePath}
+            fill
+            alt={product.name}
+            className="object-cover"
+          />
         </div>
         <div>
-          <div className="text-lg">{(product.priceInCents / 100).toFixed(2)} USD</div>
+          <div className="text-lg">
+            {(product.priceInCents / 100).toFixed(2)} USD
+          </div>
           <h1 className="text-2xl font-bold">{product.name}</h1>
-          <div className="line-clamp-3 text-muted-foreground">{product.description}</div>
+          <div className="line-clamp-3 text-muted-foreground">
+            {product.description}
+          </div>
         </div>
       </div>
 
@@ -62,7 +77,13 @@ export function CheckoutForm({ product, clientSecret }: CheckoutFormProps) {
   );
 }
 
-function Form({ priceInCents, productid }: { priceInCents: number, productid: string }) {
+function Form({
+  priceInCents,
+  productid,
+}: {
+  priceInCents: number;
+  productid: string;
+}) {
   const stripe = useStripe();
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
@@ -77,12 +98,14 @@ function Form({ priceInCents, productid }: { priceInCents: number, productid: st
     setIsLoading(true);
 
     // Check ofr existing order
-    const orderExists = await userOrderExists(email, productid)
+    const orderExists = await userOrderExists(email, productid);
 
-    if (orderExists){
-        setErrorMessage("You have already purchased this product, check your products")
-        setIsLoading(false)
-        return // return if they already have the order
+    if (orderExists) {
+      setErrorMessage(
+        "You have already purchased this product, check your products"
+      );
+      setIsLoading(false);
+      return; // return if they already have the order
     }
 
     stripe
@@ -116,8 +139,10 @@ function Form({ priceInCents, productid }: { priceInCents: number, productid: st
         </CardHeader>
         <CardContent>
           <PaymentElement />
-          <div className = "mt-4">
-          <LinkAuthenticationElement onChange = {e => setEmail(e.value.email)}/>
+          <div className="mt-4">
+            <LinkAuthenticationElement
+              onChange={(e) => setEmail(e.value.email)}
+            />
           </div>
         </CardContent>
         <CardFooter>
