@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import "./productCard.css";
-import { createDownloadVerification } from "@/actions/downloadVerification";
 
 type ProductCardProps = {
   id: string;
@@ -21,11 +19,6 @@ export function DownloadProduct({
   description,
   imagePath,
 }: ProductCardProps) {
-  const [downloadLinkId, setDownloadLinkId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
-
-
   return (
     <div className="card">
       <div className="card-image-container">
@@ -38,13 +31,11 @@ export function DownloadProduct({
         <p className="line-clamp-4">{description}</p>
       </div>
       <div className="card-footer">
-        
-          <Link href={`/orders/${id}/download`}>
-            <Button size="lg" className="button-full-width">
-              Download
-            </Button>
-          </Link>
-        
+        <Link href={`/orders/${id}/download`}>
+          <Button size="lg" className="button-full-width">
+            Download
+          </Button>
+        </Link>
       </div>
     </div>
   );

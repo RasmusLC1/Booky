@@ -4,14 +4,13 @@ import db from "@/db/db";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table"; // Updated import
 import Link from "next/link";
-import { CheckCircle, CheckCircle2, MoreVertical, XCircle } from "lucide-react";
+import { CheckCircle2, MoreVertical, XCircle } from "lucide-react";
 import { formatCurrency, formatNumber } from "@/lib/formatters";
 import {
   DropdownMenu,

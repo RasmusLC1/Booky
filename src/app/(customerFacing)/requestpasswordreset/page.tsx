@@ -21,11 +21,11 @@ export default function ResetPassword() {
       const result = await sendPasswordResetEmail(email);
 
       if (result?.error) {
-        setErrors(result.error);
+        setErrors({ email: result.error });
       } else if (result?.message) {
         setStatus(result.message);
       }
-    } catch (error) {
+    } catch {
       setStatus("An unexpected error occurred. Please try again.");
     }
   };
@@ -47,8 +47,8 @@ export default function ResetPassword() {
               placeholder="Email"
               required
             />
-            {errors.email && <p className="text-red-500">{errors.email}</p>} {/* Show errors */}
-            <Button type="submit" className="top-10px">
+            {errors.email && <p className="text-red-500">{errors.email}</p>}
+            <Button type="submit" className="submit_button mt-4">
               Send Email
             </Button>
           </form>
