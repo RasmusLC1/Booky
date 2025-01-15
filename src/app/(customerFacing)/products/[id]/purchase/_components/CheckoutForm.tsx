@@ -40,7 +40,7 @@ export function CheckoutForm({ product, clientSecret }: CheckoutFormProps) {
       {/* Demo Banner */}
       <div className="demo-banner">
         <p>
-          🚨 <strong>This is a demo site.</strong> The books contain random PDF data. To test a purchase, use the card number <strong>4242 4242 4242 4242</strong>, expiration date <strong>12/30</strong>, CVC <strong>325</strong>, and your email.
+          🚨 <strong>This is a demo site.</strong> The books contain random PDF data. I don't have a live Stripe API key. To add order go back to products and press the <strong>Demo Add Order</strong> Button  .
         </p>
       </div>
 
