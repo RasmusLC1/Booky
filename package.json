@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "concurrently \"stripe listen --forward-to http://localhost:3000/webhooks/stripe\" \"next dev\"",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "email": "email dev --dir src/email --port 3001"

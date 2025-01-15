@@ -11,7 +11,6 @@ import { DeleteDropDownItem } from "./_components/UserActions"
 import {
     Table,
     TableBody,
-    TableCaption,
     TableCell,
     TableHead,
     TableHeader,

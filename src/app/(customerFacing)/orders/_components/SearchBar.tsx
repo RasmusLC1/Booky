@@ -4,38 +4,37 @@ import { useState } from "react";
 import { DownloadProduct } from "@/components/DownloadProductCard";
 
 type Product = {
-    id: string;
-    name: string;
-    author: string;
-    description: string;
-    priceInCents: number;
-    imagePath: string;
-    createdAt: Date;   
-    updatedAt: Date;    
-  };
+  id: string;
+  name: string;
+  author: string;
+  description: string;
+  priceInCents: number;
+  imagePath: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 interface ProductsSearchProps {
   products: Product[];
 }
 
-export default function ProductsSearch({ products}: ProductsSearchProps) {
+export default function ProductsSearch({ products }: ProductsSearchProps) {
   const [query, setQuery] = useState("");
 
   // Filter the products by `query`.
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(query.toLowerCase()) ||
-    product.author.toLowerCase().includes(query.toLowerCase()),
+  const filteredProducts = products.filter(
+    (product) =>
+      product.name.toLowerCase().includes(query.toLowerCase()) ||
+      product.author.toLowerCase().includes(query.toLowerCase())
   );
 
-
-
   return (
-    <div className="space-y-4"> 
-      
-
+    <div className="space-y-4">
       {/* Search Section */}
       <div className="space-y-4">
-        <h2 className="text-2xl font-bold text-center">Search through your orders</h2>
+        <h2 className="text-2xl font-bold text-center">
+          Search through your orders
+        </h2>
 
         {/* Search Input */}
         <input

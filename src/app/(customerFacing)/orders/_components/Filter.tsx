@@ -6,7 +6,11 @@ type FilterProps = {
   onFilterSelect: (value: string) => void;
 };
 
-function MenuItems({ onClickItem }: { onClickItem: (filterKey: string) => void }) {
+function MenuItems({
+  onClickItem,
+}: {
+  onClickItem: (filterKey: string) => void;
+}) {
   return (
     <ul className="flex flex-col gap-2">
       <button onClick={() => onClickItem("newest")}>Newest</button>
@@ -56,12 +60,11 @@ export default function Filter({ onFilterSelect }: FilterProps) {
           </svg>
         </button>
       </div>
-  
+
       {/* Menu content */}
       <div className={`menuContainer ${menuOpen ? "open" : "closed"}`}>
         <MenuItems onClickItem={handleItemClick} />
       </div>
     </div>
   );
-  
 }

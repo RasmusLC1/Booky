@@ -18,7 +18,6 @@ import {
   useStripe,
 } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-import { error } from "console";
 import Image from "next/image";
 import { FormEvent, useState } from "react";
 import "./banner.css"

@@ -32,7 +32,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
   const [filterOption, setFilterOption] = useState("newest");
 
   // 3) Copy the array for sorting/filtering
-  let filteredProducts = [...dateFixedProducts];
+  const filteredProducts = [...dateFixedProducts];
 
   // 4) Apply filter logic
   switch (filterOption) {

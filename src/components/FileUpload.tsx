@@ -1,7 +1,7 @@
 "use client";
 
 import { formatFileSize } from "@edgestore/react/utils";
-import { UploadCloudIcon, X } from "lucide-react";
+import { UploadCloudIcon} from "lucide-react";
 import * as React from "react";
 import { useDropzone, type DropzoneOptions } from "react-dropzone";
 import { twMerge } from "tailwind-merge";
@@ -26,18 +26,11 @@ type InputProps = {
   dropzoneOptions?: Omit<DropzoneOptions, "disabled">;
 };
 
-const ERROR_MESSAGES = {
-  fileTooLarge(maxSize: number) {
-    return `The file is too large. Max size is ${formatFileSize(maxSize)}.`;
-  },
-  tooManyFiles(maxFiles: number) {
-    return `You can only add ${maxFiles} file(s).`;
-  },
-};
+
 
 const SingleFileDropzone = React.forwardRef<HTMLInputElement, InputProps>(
   (
-    { dropzoneOptions, width, height, value, className, disabled, onChange },
+    { dropzoneOptions, width, height, className, disabled, onChange },
     ref
   ) => {
     const {

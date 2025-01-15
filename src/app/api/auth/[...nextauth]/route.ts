@@ -35,7 +35,7 @@ export const authOptions = {
           type: "password",
         },
       },
-      async authorize(credentials, req) {
+      async authorize(credentials) {
         // The `credentials` object is whatever is passed to signIn("credentials", {...})
         // Call your existing loginVerification function
         const formData = new FormData()
