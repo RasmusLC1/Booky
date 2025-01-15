@@ -20,10 +20,11 @@ const addSchema = z.object({
   description: z.string().min(1),
   category: z.string().min(1),
   priceInCents: z.coerce.number().int(),
-  file: fileSchema.refine((file) => file.size > 0, "Required"),
-  image: imageSchema.refine((file) => file.size > 0, "Required"),
+  filePath: z.string().url(),
+  imagePath: z.string().url(),
 });
 
+// Update the `addProduct` function to handle EdgeStore URLs
 export async function addProduct(prevState: unknown, formData: FormData) {
   const result = addSchema.safeParse(Object.fromEntries(formData.entries()));
   if (result.success === false) {
@@ -31,50 +32,34 @@ export async function addProduct(prevState: unknown, formData: FormData) {
   }
   const data = result.data;
 
-  // Santise input to prevent sql injection
+  // Sanitize input to prevent SQL injection
   data.name = sanitizeHtml(data.name);
   data.description = sanitizeHtml(data.description);
   data.category = sanitizeHtml(data.category);
+
+  // Ensure the form fields are valid
   if (
-    data.name.length > 0 ||
-    data.description.length > 0 ||
+    data.name.length > 0 &&
+    data.description.length > 0 &&
     data.category.length > 0
   ) {
-    // Handle multiple requests recursively
-    await fs.mkdir("products", { recursive: true });
-    // Create a unique file path
-    const filePath = `products/${crypto.randomUUID()}-${data.file.name}`;
-    // Write the file
-    await fs.writeFile(filePath, Buffer.from(await data.file.arrayBuffer()));
-
-    // Use 'public' for ease of use
-    await fs.mkdir("public/products", { recursive: true });
-    // Create a unique image path
-    const imagePath = `/products/${crypto.randomUUID()}-${data.image.name}`;
-    // Write the image to the path
-    await fs.writeFile(
-      `public${imagePath}`,
-      Buffer.from(await data.image.arrayBuffer())
-    );
-
-    // Create the product
+    // Create the product in the SQL database
     await db.product.create({
       data: {
-        isAvailabelForPurchase: false,
+        isAvailableForPurchase: false,
         name: data.name,
         author: data.author,
         description: data.description,
         category: data.category,
         priceInCents: data.priceInCents,
-        filePath,
-        imagePath,
-        reviews: "",
-        Score: 0,
+        filePath: data.filePath, // Use the EdgeStore file URL
+        imagePath: data.imagePath, // Use the EdgeStore image URL
         length: 0,
       },
     });
   }
 
+  // Revalidate paths and redirect to the products admin page
   revalidatePath("/");
   revalidatePath("/products");
   redirect("/admin/products");
@@ -83,9 +68,9 @@ export async function addProduct(prevState: unknown, formData: FormData) {
 // Takes the data and updates the product
 export async function toggleProductAvailability(
   id: string,
-  isAvailabelForPurchase: boolean
+  isAvailableForPurchase: boolean
 ) {
-  await db.product.update({ where: { id }, data: { isAvailabelForPurchase } });
+  await db.product.update({ where: { id }, data: { isAvailableForPurchase } });
   revalidatePath("/");
   revalidatePath("/products");
 }

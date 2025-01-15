@@ -12,17 +12,17 @@ import db from "@/db/db";
 async function getSalesData() {
   const data = await db.order.aggregate({
     _sum: { priceInCents: true },
-    _count: true,
+    _count: { _all: true }, // Fix this part
   });
 
   return {
     amount: (data._sum.priceInCents || 0) / 100,
-    numberOfSales: data._count,
+    numberOfSales: data._count._all,
   };
 }
 
+
 async function getUserData() {
-  // Copple usercount and orderdata together to await together, improved performance
   const [userCount, orderData] = await Promise.all([
     db.user.count(),
     db.order.aggregate({
@@ -38,11 +38,10 @@ async function getUserData() {
         : (orderData._sum.priceInCents || 0) / userCount / 100,
   };
 }
-
 async function getProductData() {
   const [activecount, inactivecount] = await Promise.all([
-    db.product.count({ where: { isAvailabelForPurchase: true } }),
-    db.product.count({ where: { isAvailabelForPurchase: false } }),
+    db.product.count({ where: { isAvailableForPurchase: true } }),
+    db.product.count({ where: { isAvailableForPurchase: false } }),
   ]);
   return {
     activecount,

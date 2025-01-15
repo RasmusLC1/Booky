@@ -1,74 +1,77 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+  relationMode = "foreignKeys"
 }
 
 model Product {
-  id                     String                 @id @default(uuid()) // Create a product id
-  name                   String // Name of the product
-  author                String
-  priceInCents           Int // / Price computed in cents, Easy for stripe later down the road
-  filePath               String // File for the purchased item
-  imagePath              String // Path for the image
-  description            String // Description of item
-  category               String // category of item
-  length                 Int // Length of book, based on character amount
-  isAvailabelForPurchase Boolean                @default(true) // Trigger for product to be available for purchase
-  createdAt              DateTime               @default(now()) // Time the link was created
+  id                     String                 @id @default(uuid())
+  name                   String
+  author                 String
+  priceInCents           Int
+  filePath               String
+  imagePath              String
+  description            String
+  category               String
+  length                 Int
+  isAvailableForPurchase Boolean                @default(true)
+  createdAt              DateTime               @default(now())
   updatedAt              DateTime               @updatedAt
-  reviews                String
-  Score                  Int
+  reviews                Review[]
   orders                 Order[]
   downloadVerifications  DownloadVerification[]
 }
 
 model User {
-  id             String          @id @default(uuid()) // User id
-  email          String          @unique // Ensure only one of each email
-  username       String          @unique // Ensure only one of each username
+  id             String          @id @default(uuid())
+  email          String          @unique
+  username       String          @unique
   password       String
-  createdAt      DateTime        @default(now()) // Time the link was created
+  createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   orders         Order[]
   passwordResets PasswordReset[]
+  reviews        Review[]
 }
 
 model Order {
-  id           String   @id @default(uuid()) // User id
-  priceInCents Int // Stored price in case price changes
-  createdAt    DateTime @default(now()) // Time the link was created
+  id           String   @id @default(uuid())
+  priceInCents Int
+  createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  userid    String // User who placed order
-  productid String // Product purchased
+  userid    String
+  productid String
 
   user    User    @relation(fields: [userid], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productid], references: [id], onDelete: Restrict)
 }
 
 model Review {
-  id        String   @id @default(uuid()) // review id
+  id        String   @id @default(uuid())
   productid String
-  userid    String // User who placed order
+  userid    String
   headline  String
   text      String
-  createdAt DateTime @default(now()) // Time the link was created
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   rating    Int
+
+  product   Product  @relation(fields: [productid], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userid], references: [id], onDelete: Cascade)
 }
 
 model DownloadVerification {
-  id        String   @id @default(uuid()) // User id
-  expiresAt DateTime // Stored price in case price changes
-  createdAt DateTime @default(now()) // Time the link was created
+  id        String   @id @default(uuid())
+  expiresAt DateTime
+  createdAt DateTime @default(now())
   productid String
+
   product   Product  @relation(fields: [productid], references: [id], onDelete: Cascade)
 }
 
@@ -77,5 +80,6 @@ model PasswordReset {
   userId    String
   token     String   @unique
   expiresAt DateTime
-  user      User     @relation(fields: [userId], references: [id])
+
+  user User @relation(fields: [userId], references: [id])
 }
