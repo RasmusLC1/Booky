@@ -1,7 +1,7 @@
 "use client";
 
 import { NavLink } from "@/components/Nav";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 export default function SignInOrOutButton() {
   const { data: session } = useSession();

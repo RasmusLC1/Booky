@@ -8,7 +8,7 @@ import {
   } from "@/components/ui/table"; // Updated import
 
 import db from "@/db/db"
-import { formatCurrency, formatNumber } from "@/lib/formatters"
+import { formatCurrency } from "@/lib/formatters"
 import { PageHeader } from "../_components/PageHeader"
 import {
     DropdownMenu,

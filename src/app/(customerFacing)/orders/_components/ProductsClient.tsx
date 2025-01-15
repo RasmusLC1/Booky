@@ -3,24 +3,39 @@
 import React, { useState } from "react";
 import ProductsSearch from "./SearchBar";
 import Filter from "./Filter";
-
+import { Button } from "@/components/ui/button";
+import { emailOrderHistory } from "@/actions/orders";
+import "./productClient.css";
 
 type Product = {
-    id: string;
-    name: string;
-    author: string;
-    description: string;
-    priceInCents: number;
-    imagePath: string;
-    createdAt: Date;   
-    updatedAt: Date;    
-  };
+  id: string;
+  name: string;
+  author: string;
+  description: string;
+  priceInCents: number;
+  imagePath: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 interface ProductsClientProps {
   products: Product[];
+  email: string;
 }
 
-export default function ProductsClient({ products }: ProductsClientProps) {
+export default function ProductsClient({
+  products,
+  email,
+}: ProductsClientProps) {
+  const handleEmailOrderHistory = async () => {
+    try {
+      await emailOrderHistory(email);
+      alert("Order history sent via email!");
+    } catch (error) {
+      console.error("Failed to send order history:", error, email);
+      alert("Failed to send order history. Please try again.");
+    }
+  };
   // 1) Convert string dates to Date objects up front
   const dateFixedProducts = products.map((p) => ({
     ...p,
@@ -32,18 +47,18 @@ export default function ProductsClient({ products }: ProductsClientProps) {
   const [filterOption, setFilterOption] = useState("newest");
 
   // 3) Copy the array for sorting/filtering
-  let filteredProducts = [...dateFixedProducts];
+  const filteredProducts = [...dateFixedProducts];
 
   // 4) Apply filter logic
   switch (filterOption) {
     case "newest":
       filteredProducts.sort(
-        (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+        (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
       );
       break;
     case "oldest":
       filteredProducts.sort(
-        (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+        (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
       );
       break;
     case "az":
@@ -64,6 +79,11 @@ export default function ProductsClient({ products }: ProductsClientProps) {
 
   return (
     <div>
+      <div className="button-wrapper">
+        <Button onClick={handleEmailOrderHistory}>
+          Get Order History Via Email
+        </Button>
+      </div>
       {/* 5) Pass a callback to Filter so it can set the active filter */}
       <Filter onFilterSelect={setFilterOption} />
 

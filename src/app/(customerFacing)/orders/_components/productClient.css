@@ -1,0 +1,29 @@
+/* Wrapper for the entire products section */
+.products-container {
+    position: relative;
+    padding: 1rem;
+  }
+  
+  /* Position the button in the top-right corner */
+  .button-wrapper {
+    position: absolute;
+    top: 4rem;
+    right: 1rem;
+    z-index: 10;
+  }
+  
+  /* Button style (optional) */
+  .button-wrapper button {
+    background-color: darkgreen;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .button-wrapper button:hover {
+    background-color: green;
+  }
+  
