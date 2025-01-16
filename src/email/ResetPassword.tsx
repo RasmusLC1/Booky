@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import {
   Body,
   Container,
@@ -17,7 +16,6 @@ type PasswordResetProps = {
   resetUrl: string;
 };
 
-
 export default function Reset_Password({
   user,
   resetUrl,
@@ -32,14 +30,17 @@ export default function Reset_Password({
             <Heading>Hello, {user.username}</Heading>
             <div>
               <p className="mb-4">
-                We heard that your lost access to your password, please click the link below to reset your password
+                We heard you lost access to your password. Please click the link
+                below to reset it:
               </p>
-              <Button>
-              <a href={resetUrl} className="space-x-2">
+              <a
+                href={resetUrl}
+                className="inline-block px-4 py-2 bg-blue-500 text-white rounded"
+                style={{ textDecoration: "none" }}
+              >
                 Reset Password
               </a>
-                </Button>
-              <p>Best regards,</p>
+              <p className="mt-4">Best regards,</p>
               <p>The Booky Team</p>
             </div>
           </Container>
