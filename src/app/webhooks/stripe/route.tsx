@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
           order={order}
           product={product}
           downloadVerificationId={downloadVerification.id}
-          serverUrl = {process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000"}
+          serverUrl = {process.env.NEXT_PUBLIC_SERVER_URL || "https://booky-mu.vercel.app/"}
         />
       ),
     })
