@@ -53,7 +53,7 @@ OrderHistoryEmail.PreviewProps = {
       },
     },
   ],
-  serverUrl: "http://localhost:3000"
+  serverUrl: "https://booky-mu.vercel.app/"
 } satisfies OrderHistoryEmailProps
 
 export default function OrderHistoryEmail({ orders, serverUrl}: OrderHistoryEmailProps) {

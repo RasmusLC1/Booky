@@ -36,7 +36,7 @@ export async function SendAccountCreationEmail(
     from: `Support <${process.env.SENDER_EMAIL}>`,
     to: user.email,
     subject: `Welcome to Booky! ${user.username}`,
-    react: <AccountCreationEmail user={user} serverUrl={process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000"} />,
+    react: <AccountCreationEmail user={user} serverUrl={process.env.NEXT_PUBLIC_SERVER_URL || "https://booky-mu.vercel.app/"} />,
   })
 
   if (data.error) {

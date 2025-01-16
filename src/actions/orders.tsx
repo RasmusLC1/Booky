@@ -58,7 +58,7 @@ export async function emailOrderHistory(
     from: `Support <${process.env.SENDER_EMAIL}>`,
     to: user.email,
     subject: "Order History",
-    react: <OrderHistoryEmail orders={await Promise.all(orders)} serverUrl={process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000"} />,
+    react: <OrderHistoryEmail orders={await Promise.all(orders)} serverUrl={process.env.NEXT_PUBLIC_SERVER_URL || "https://booky-mu.vercel.app/"} />,
   })
 
   if (data.error) {

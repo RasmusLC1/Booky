@@ -32,7 +32,7 @@ PurchaseReceiptEmail.PreviewProps = {
     priceInCents: 10000,
   },
   downloadVerificationId: crypto.randomUUID(),
-  serverUrl: "http://localhost:3000"
+  serverUrl: "https://booky-mu.vercel.app/"
 } satisfies PurchaseReceiptEmailProps;
 
 export default function PurchaseReceiptEmail({
