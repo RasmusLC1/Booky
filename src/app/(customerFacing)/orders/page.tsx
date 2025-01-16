@@ -44,48 +44,50 @@ export default async function MyOrdersPage() {
   );
 }
 
-const getOrders = cache(async (email: string): Promise<UserWithOrders["orders"]> => {
-  try {
-    // Fetch user and their orders from the database
-    const user = await db.user.findUnique({
-      where: { email },
-      include: {
-        orders: {
-          include: {
-            product: true,
+const getOrders = cache(
+  async (email: string): Promise<UserWithOrders["orders"]> => {
+    try {
+      // Fetch user and their orders from the database
+      const user = await db.user.findUnique({
+        where: { email },
+        include: {
+          orders: {
+            include: {
+              product: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    if (!user || !user.orders) {
+      if (!user || !user.orders) {
+        return [];
+      }
+
+      // Add download verification for each order
+      return await Promise.all(
+        user.orders.map(async (order) => {
+          const downloadVerification = await db.downloadVerification.create({
+            data: {
+              expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+              productid: order.product.id,
+            },
+          });
+
+          return {
+            ...order,
+            downloadVerificationId: downloadVerification.id,
+          };
+        })
+      );
+    } catch (error) {
+      console.error("Error fetching orders:", error);
       return [];
     }
-
-    // Add download verification for each order
-    return await Promise.all(
-      user.orders.map(async (order) => {
-        const downloadVerification = await db.downloadVerification.create({
-          data: {
-            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-            productid: order.product.id,
-          },
-        });
-
-        return {
-          ...order,
-          downloadVerificationId: downloadVerification.id,
-        };
-      })
-    );
-  } catch (error) {
-    console.error("Error fetching orders:", error);
-    return [];
   }
-});
+);
 
 async function ProductsSuspense({ session }: { session: Session }) {
-  if (!session.user || !session.user.email) {
+  if (!session.user || !session.user.email || !session.user.name) {
     return <p>No orders found.</p>;
   }
 
@@ -101,8 +103,8 @@ async function ProductsSuspense({ session }: { session: Session }) {
   );
 
   return (
-    <div suppressHydrationWarning>
-      <ProductsClient products={products} email={session.user.email} />
+    <div suppressHydrationWarning className="space-y-4">
+      <ProductsClient products={products} email={session.user.email} username={session.user.name}  />
     </div>
   );
 }
