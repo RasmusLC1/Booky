@@ -32,5 +32,5 @@ async function isAuthenticated(req: NextRequest) {
 }
 
 export const config = {
-  matcher: "/admin/:path*", // Any page or subpage of the admin folder
+  matcher: "/admin/:path*", // subpages of the admin folder
 };
