@@ -21,11 +21,13 @@ type Product = {
 interface ProductsClientProps {
   products: Product[];
   email: string;
+  username: string;
 }
 
 export default function ProductsClient({
   products,
   email,
+  username,
 }: ProductsClientProps) {
   const handleEmailOrderHistory = async () => {
     try {
@@ -86,7 +88,12 @@ export default function ProductsClient({
       </div>
       {/* 5) Pass a callback to Filter so it can set the active filter */}
       <Filter onFilterSelect={setFilterOption} />
-
+      {/* Welcome Section */}
+      <div className="text-center space-y-4">
+        <h1 className="text-2xl font-bold">
+          Welcome {username}
+        </h1>
+      </div>
       {/* 6) Render the (optionally) filtered products */}
       <ProductsSearch products={filteredProducts} />
     </div>
