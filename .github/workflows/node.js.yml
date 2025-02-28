@@ -32,12 +32,11 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-prisma-
 
-    # Remove or comment out the Install dependencies step
-    # - name: Install dependencies
-    #   run: npm ci
+    - name: Install dependencies
+      run: npm install
 
     - name: Generate Prisma client
-      run: npm run prisma generate
+      run: npx prisma generate  # Using npx to directly run Prisma CLI
 
     - name: Build project
       run: npm run build --if-present
