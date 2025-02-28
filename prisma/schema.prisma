@@ -56,8 +56,8 @@ model Review {
   id        String   @id @default(uuid())
   productid String
   userid    String
-  headline  String
-  text      String
+  headline  String?  // Make headline optional
+  text      String?  // Make text optional
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   rating    Int
@@ -65,6 +65,7 @@ model Review {
   product   Product  @relation(fields: [productid], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userid], references: [id], onDelete: Cascade)
 }
+
 
 model DownloadVerification {
   id        String   @id @default(uuid())

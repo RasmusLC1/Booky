@@ -1,0 +1,37 @@
+/* Ensure the rating container is centered */
+.rating {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+    gap: 5px;
+  }
+  
+  /* Hide radio buttons */
+  .rating input {
+    display: none;
+  }
+  
+  /* Style the stars */
+  .rating label {
+    cursor: pointer;
+    color: #ccc;
+    font-size: 30px;
+    transition: color 0.3s;
+  }
+  
+  .rating label:before {
+    content: '\2605'; /* Unicode star */
+  }
+  
+  /* Highlight selected stars */
+  .rating label.selected,
+  .rating label:hover,
+  .rating label:hover ~ label {
+    color: #6f00ff;
+  }
+  
+  /* Ensure that the selected state persists */
+  .rating input:checked ~ label {
+    color: #6f00ff;
+  }
+  
