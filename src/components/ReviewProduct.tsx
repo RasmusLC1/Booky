@@ -15,7 +15,6 @@ async function fetchReview(productid: string, userid: string) {
 
 export function ReviewProduct({ productid }: { productid: string }) {
   const [rating, setRating] = useState<number | null>(null);
-  const [existingReview, setExistingReview] = useState<number | null>(null);
   const [isPending, startTransition] = useTransition();
 
   // Assume you have a way to get the current logged-in user's ID
@@ -26,7 +25,6 @@ export function ReviewProduct({ productid }: { productid: string }) {
     async function loadReview() {
       const review = await fetchReview(productid, userid); // Pass userid here
       if (review) {
-        setExistingReview(review.rating);
         setRating(review.rating); // Set the initial rating to the fetched review rating
       }
     }

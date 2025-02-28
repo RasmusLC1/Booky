@@ -1,13 +1,12 @@
 "use client";
 
 import "./ReviewProduct.css";
-import { useState, useEffect, useTransition } from "react";
-import { submitReview } from "@/app/actions/submitReview";
+import { useState, useEffect } from "react";
 
 // Fetch review from the API endpoint
 type Review = { rating: number };
 
-async function fetchReview(productid: string, userid: string): Promise<Review[]> {
+async function fetchReview(productid: string): Promise<Review[]> {
   const response = await fetch(`/api/getProductReview/${productid}`);
   if (!response.ok) {
     return []; // Return an empty array if no reviews are found
@@ -28,7 +27,7 @@ export function GetProductReviews({ productid }: { productid: string }) {
 
   useEffect(() => {
     async function loadReviews() {
-      const reviews = await fetchReview(productid, "current_user_id");
+      const reviews = await fetchReview(productid);
       if (reviews.length > 0) {
         setExistingReview(getAverageRating(reviews));
       }
