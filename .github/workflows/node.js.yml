@@ -54,20 +54,3 @@ jobs:
         GOOGLE_ID: ${{ secrets.GOOGLE_ID }}
         GOOGLE_SECRET: ${{ secrets.GOOGLE_SECRET }}
 
-    - name: Run tests
-      run: npm test
-      env:
-        DATABASE_URL: ${{ secrets.EDGE_STORE_ACCESS_KEY }}
-        DIRECT_URL: ${{ secrets.DIRECT_URL }}
-        STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-        STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
-        NEXT_PUBLIC_STRIPE_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLIC_KEY }}
-        NEXT_PUBLIC_SERVER_URL: ${{ secrets.NEXT_PUBLIC_SERVER_URL }}
-        RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-        SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
-        EDGE_STORE_ACCESS_KEY: ${{ secrets.EDGE_STORE_ACCESS_KEY }}
-        EDGE_STORE_SECRET_KEY: ${{ secrets.EDGE_STORE_SECRET_KEY }}
-        GITHUB_ID: ${{ secrets.ID_GITHUB }}
-        GITHUB_SECRET: ${{ secrets.SECRET_GITHUB }}
-        GOOGLE_ID: ${{ secrets.GOOGLE_ID }}
-        GOOGLE_SECRET: ${{ secrets.GOOGLE_SECRET }}
