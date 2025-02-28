@@ -1,6 +1,6 @@
 "use client";
 
-import "./ReviewProduct.css";
+import "./getProductReviews.css";
 import { useState, useEffect } from "react";
 
 // Fetch review from the API endpoint

@@ -32,8 +32,6 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-prisma-
 
-    - name: Install dependencies
-      run: npm install
 
     - name: Generate Prisma client
       run: npx prisma generate  # Using npx to directly run Prisma CLI
