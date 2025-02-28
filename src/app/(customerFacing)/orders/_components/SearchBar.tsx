@@ -47,7 +47,9 @@ export default function ProductsSearch({ products }: ProductsSearchProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProducts.map((product) => (
-            <DownloadProduct key={product.id} {...product} />
+            <div key={product.id}>
+              <DownloadProduct {...product} />
+            </div>
           ))}
         </div>
       </div>
