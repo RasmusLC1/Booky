@@ -38,6 +38,12 @@ jobs:
 
     - name: Build project
       run: npm run build --if-present
+      env:
+        EDGE_STORE_ACCESS_KEY: ${{ secrets.EDGE_STORE_ACCESS_KEY }}
+        EDGE_STORE_SECRET_KEY: ${{ secrets.EDGE_STORE_SECRET_KEY }}
 
     - name: Run tests
       run: npm test
+      env:
+        EDGE_STORE_ACCESS_KEY: ${{ secrets.EDGE_STORE_ACCESS_KEY }}
+        EDGE_STORE_SECRET_KEY: ${{ secrets.EDGE_STORE_SECRET_KEY }}
