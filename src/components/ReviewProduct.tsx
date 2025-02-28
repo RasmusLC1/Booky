@@ -6,7 +6,7 @@ import { submitReview } from "@/app/actions/submitReview";
 
 // Fetch review from the API endpoint
 async function fetchReview(productid: string, userid: string) {
-  const response = await fetch(`/api/review/${productid}?userid=${userid}`); // Pass userid in the query string
+  const response = await fetch(`/api/getuserreview/${productid}?userid=${userid}`); // Pass userid in the query string
   if (!response.ok) {
     return null; // No review found
   }
@@ -17,7 +17,6 @@ export function ReviewProduct({ productid }: { productid: string }) {
   const [rating, setRating] = useState<number | null>(null);
   const [existingReview, setExistingReview] = useState<number | null>(null);
   const [isPending, startTransition] = useTransition();
-  const [message, setMessage] = useState<string | null>(null);
 
   // Assume you have a way to get the current logged-in user's ID
   const userid = "current_user_id"; // Replace with actual method to get the logged-in user ID
@@ -36,22 +35,18 @@ export function ReviewProduct({ productid }: { productid: string }) {
 
   const handleRating = (value: number) => {
     setRating(value);
-
-    // Send to server
+  
     startTransition(async () => {
       const formData = new FormData();
       formData.append("productid", productid);
       formData.append("rating", value.toString());
-      formData.append("userid", userid); // Include userid in the request
-
-      const response = await submitReview(formData);
-      if (response.success) {
-        setMessage("Review submitted!");
-      } else {
-        setMessage(response.error?.db || "Failed to submit review");
-      }
+      formData.append("userid", userid);
+  
+      await submitReview(formData);
+  
     });
   };
+  
 
   return (
     <div className="rating">
@@ -72,13 +67,6 @@ export function ReviewProduct({ productid }: { productid: string }) {
           />
         </label>
       ))}
-      {existingReview !== null && (
-        <>
-          <p className="existing-review">
-            {existingReview > 1}
-          </p>
-        </>
-      )}
     </div>
   );
 }

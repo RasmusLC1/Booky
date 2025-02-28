@@ -27,11 +27,11 @@
   .rating label.selected,
   .rating label:hover,
   .rating label:hover ~ label {
-    color: #6f00ff;
+    color: gold;
   }
   
   /* Ensure that the selected state persists */
   .rating input:checked ~ label {
-    color: #6f00ff;
+    color: gold;
   }
   
