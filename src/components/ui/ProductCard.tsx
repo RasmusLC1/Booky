@@ -13,6 +13,7 @@ import { Button } from "./button";
 import Link from "next/link";
 import Image from "next/image";
 import CreateOrder from "../CreateOrder";
+import { GetProductReviews } from "../getProductReviews";
 
 type ProductCardProps = {
   id: string;
@@ -50,6 +51,8 @@ export function ProductCard({
       </div>
       <CardHeader>
         <CardTitle>{name}</CardTitle>
+        <GetProductReviews productid={id} />
+
         <CardDescription>{formatCurrency(priceInCents / 100)}</CardDescription>
       </CardHeader>
       <CardContent className="flex-grow">

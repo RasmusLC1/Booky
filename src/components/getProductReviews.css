@@ -24,9 +24,7 @@
   }
   
   /* Highlight selected stars */
-  .rating label.selected,
-  .rating label:hover,
-  .rating label:hover ~ label {
+  .rating label.selected{
     color: gold;
   }
   
