@@ -11,6 +11,7 @@ export async function GET(request: NextRequest) {
   if (!productid || !userid) {
     return NextResponse.json({ error: 'Product ID and User ID are required' }, { status: 400 });
   }
+  console.log("FETCH REVIEW", productid, userid)
 
   try {
     const review = await db.review.findFirst({

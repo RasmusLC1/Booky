@@ -18,6 +18,7 @@ export async function submitReview(formData: FormData) {
     rating: Number(formData.get("rating")), // Convert from FormData
   });
 
+
   if (!result.success) {
     return { error: result.error.format() };
   }
@@ -64,6 +65,7 @@ export async function submitReview(formData: FormData) {
         },
       });
     } else {
+      console.log("CREATE NEW REVIEW")
       // Create a new review
       await db.review.create({
         data: {

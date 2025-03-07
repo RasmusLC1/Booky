@@ -1,19 +1,12 @@
-"use client"; 
+"use client";
 
 import { formatCurrency } from "@/lib/formatters";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "./card";
 import { Button } from "./button";
 import Link from "next/link";
 import Image from "next/image";
 import CreateOrder from "../CreateOrder";
 import { GetProductReviews } from "../getProductReviews";
+import "../productCard.css";
 
 type ProductCardProps = {
   id: string;
@@ -23,7 +16,6 @@ type ProductCardProps = {
   imagePath: string;
 };
 
-
 // Actual card layout for products
 export function ProductCard({
   id,
@@ -32,64 +24,57 @@ export function ProductCard({
   priceInCents,
   imagePath,
 }: ProductCardProps) {
-
   async function handleCreateOrder() {
-    console.log("HANDLE CREATE");
     const response = await CreateOrder(id);
-
-    if (response.error) {
-      alert(`Error: ${response.error}`);
-    } else {
-      alert(response.message || "Order created successfully!");
-    }
+    alert(
+      response.error
+        ? `Error: ${response.error}`
+        : response.message || "Order created successfully!"
+    );
   }
 
   return (
-    <Card className="flex overflow-hidden flex-col">
-      <div className="relative w-full h-auto aspect-video">
-        <Image src={imagePath} fill alt={name} />
+    <div className="card">
+      <div className="card-image-container">
+        <Image src={imagePath} fill alt={name} className="book-cover" />
       </div>
-      <CardHeader>
-        <CardTitle>{name}</CardTitle>
+      <div className="card-header">
+        <h2 className="card-title">{name}</h2>
         <GetProductReviews productid={id} />
-
-        <CardDescription>{formatCurrency(priceInCents / 100)}</CardDescription>
-      </CardHeader>
-      <CardContent className="flex-grow">
+        <p className="card-description">{formatCurrency(priceInCents / 100)}</p>
+      </div>
+      <div className="card-content">
         <p className="line-clamp-4">{description}</p>
-      </CardContent>
-      <CardFooter>
-      <Button onClick={handleCreateOrder}>DEMO Add Order</Button>
-
-        <Button asChild size="lg" className="w-full">
-          <Link href={`/products/${id}/purchase`}>Purchase</Link>
-        </Button>
-      </CardFooter>
-    </Card>
+      </div>
+      <div className="card-footer">
+        <div className="card-footer buttons-row">
+          <Button onClick={handleCreateOrder}>DEMO Add Order</Button>
+          <Button asChild size="lg" className="button-full-width">
+            <Link href={`/products/${id}/purchase`}>Purchase</Link>
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }
 
-// Acts as a loading screen that pulses grey while loading
+// Skeleton loader for loading state
 export function ProductCardSkeleton() {
-    return (
-      <Card className="overflow-hidden flex flex-col animate-pulse">
-        <div className="w-full aspect-video bg-gray-300" />
-        <CardHeader>
-          <CardTitle>
-            <div className="w-3/4 h-6 rounded-full bg-gray-300" />
-          </CardTitle>
-          <CardDescription>
-            <div className="w-1/2 h-4 rounded-full bg-gray-300" />
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <div className="w-full h-4 rounded-full bg-gray-300" />
-          <div className="w-full h-4 rounded-full bg-gray-300" />
-          <div className="w-3/4 h-4 rounded-full bg-gray-300" />
-        </CardContent>
-        <CardFooter>
-          <Button className="w-full" disabled size="lg"></Button>
-        </CardFooter>
-      </Card>
-    )
-  }
+  return (
+    <div className="skeleton-card">
+      <div className="card-image-container skeleton-line" />
+      <div className="skeleton-card-header">
+        <div className="skeleton-card-title" />
+        <div className="skeleton-card-description" />
+      </div>
+      <div className="skeleton-content">
+        <div className="skeleton-line" />
+        <div className="skeleton-line" />
+        <div className="skeleton-line skeleton-line-short" />
+      </div>
+      <div className="card-footer">
+        <Button className="button-full-width" disabled size="lg"></Button>
+      </div>
+    </div>
+  );
+}
