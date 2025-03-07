@@ -30,7 +30,6 @@ export async function POST(req: NextRequest) {
     })
     // 2. If user does NOT exist, return error
     if (!user) {
-      console.log("USER DOES NOT EXISTS")
       return NextResponse.json(
         { message: "User does not exist. Please create an account." },
         { status: 404 }

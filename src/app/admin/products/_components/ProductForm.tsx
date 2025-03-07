@@ -83,7 +83,6 @@ export function ProductForm({ product }: ProductFormProps) {
     startTransition(() => {
       try {
         action(formData);
-        console.log("Form submitted to the database.");
       } catch (err) {
         console.error("Error submitting form:", err);
       }

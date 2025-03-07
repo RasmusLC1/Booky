@@ -1,69 +1,78 @@
 "use client";
-
-import "./ReviewProduct.css";
 import { useState, useEffect, useTransition } from "react";
 import { submitReview } from "@/app/actions/submitReview";
-
-// Fetch review from the API endpoint
-async function fetchReview(productid: string, userid: string) {
-  const response = await fetch(`/api/getuserreview/${productid}?userid=${userid}`); // Pass userid in the query string
-  if (!response.ok) {
-    return null; // No review found
-  }
-  return response.json();
-}
+import "./ReviewProduct.css";
 
 export function ReviewProduct({ productid }: { productid: string }) {
   const [rating, setRating] = useState<number | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [hoverRating, setHoverRating] = useState<number | null>(null);
+  const userid = "current_user_id"; // Replace with actual user ID
 
-  // Assume you have a way to get the current logged-in user's ID
-  const userid = "current_user_id"; // Replace with actual method to get the logged-in user ID
-
-  // Fetch the existing review when the component mounts
   useEffect(() => {
+    let isMounted = true;
+    const controller = new AbortController();
+
     async function loadReview() {
-      const review = await fetchReview(productid, userid); // Pass userid here
-      if (review) {
-        setRating(review.rating); // Set the initial rating to the fetched review rating
+      try {
+        const response = await fetch(`/api/getuserreview/${productid}?userid=${userid}`, {
+          signal: controller.signal
+        });
+        if (isMounted && response.ok) {
+          const review = await response.json();
+          setRating(review?.rating || null);
+        }
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          console.error("Fetch error:", error);
+        }
       }
     }
+
+    setRating(null);
     loadReview();
-  }, [productid, userid]); // Add userid as a dependency to re-fetch if it changes
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }, [productid, userid]);
 
   const handleRating = (value: number) => {
-    setRating(value);
+    if (isPending) return;
   
     startTransition(async () => {
-      const formData = new FormData();
-      formData.append("productid", productid);
-      formData.append("rating", value.toString());
-      formData.append("userid", userid);
-  
-      await submitReview(formData);
-  
+      try {
+        const formData = new FormData();
+        formData.append("productid", productid);
+        formData.append("rating", value.toString());
+        formData.append("userid", userid);
+        
+        await submitReview(formData);
+        setRating(value);
+      } catch (error) {
+        console.error("Submission error:", error);
+      }
     });
   };
   
-
+  // Update the JSX to use proper ordering without CSS transforms
   return (
-    <div className="rating">
-      {[5, 4, 3, 2, 1].map((value) => (
-        <label
-          key={value}
-          htmlFor={`star${value}`}
-          className={rating !== null && rating >= value ? "selected" : ""}
-        >
-          <input
-            type="radio"
-            id={`star${value}`}
-            name="rating"
-            value={value}
-            checked={rating === value}
-            onChange={() => handleRating(value)}
-            disabled={isPending} // Disable while submitting
-          />
-        </label>
+    <div className="star-rating">
+      {[1, 2, 3, 4, 5].reverse().map((value) => (
+        <button
+        key={value}
+        type="button"
+        className={`star ${((hoverRating ?? 0) || (rating ?? 0)) >= value ? "active" : ""}`}
+        onMouseEnter={() => setHoverRating(value)}
+        onMouseLeave={() => setHoverRating(null)}
+        onClick={() => handleRating(value)}
+        disabled={isPending}
+        aria-label={`Rate ${value} stars`}
+      >
+        ★
+      </button>
+      
       ))}
     </div>
   );

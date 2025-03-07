@@ -4,7 +4,6 @@ import { getUserIdFromSession } from '@/app/actions/getUserID';
 
 export async function GET(request: NextRequest) {
   const productid = request.nextUrl.pathname.split('/').pop(); // Get the last segment of the path
-  console.log("Extracted Product ID:", productid); // Log the product ID for debugging
 
   const userid = await getUserIdFromSession();
 
