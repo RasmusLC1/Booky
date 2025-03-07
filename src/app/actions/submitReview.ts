@@ -56,7 +56,6 @@ export async function submitReview(formData: FormData) {
   try {
     if (existingReview) {
       // Update the existing review
-      console.log("UPDATE")
       await db.review.update({
         where: { id: existingReview.id },
         data: {
@@ -65,7 +64,6 @@ export async function submitReview(formData: FormData) {
         },
       });
     } else {
-      console.log("CREATE NEW REVIEW")
       // Create a new review
       await db.review.create({
         data: {
