@@ -5,6 +5,7 @@ import db from "@/db/db";
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession();
+    console.log("SESSION ", session)
 
     if (!session || !session.user) {
       return NextResponse.json({ error: "Not logged in" }, { status: 401 });
