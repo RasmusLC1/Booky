@@ -10,10 +10,11 @@
 using System;
 using System.Reflection;
 
+[assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("144f89e4-dce6-4834-9504-16362549a946")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("Booky.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fbbde824114c9058eb32b4899aa789c9f146ef3d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+21ad206a30c3e086d69eaeda9d9389794118b9f1")]
 [assembly: System.Reflection.AssemblyProductAttribute("Booky.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Booky.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

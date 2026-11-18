@@ -16,34 +16,20 @@ function generateRandomPassword(): string {
  */
 export async function createAccountIfNeeded(
   user: { id?: string; email?: string | null; name?: string | null },
-) {
-  // If there's no email, we can't create an account in your DB
-  if (!user?.email) {
-    console.warn("No email found for user:", user);
-    return;
-  }
-
-  // 1. Check if user already exists in DB by email
-  const existingUser = await db.user.findUnique({
-    where: { email: user.email },
-  });
-
-  // 2. If user already exists, do nothing
-  if (existingUser) {
-    return;
-  }
-
-
-  // Hash a random password with a salt factor
-  const randomHashedPassword = await bcrypt.hash(generateRandomPassword(), 12);
-
-  // 3. If user does not exist, create a new record
-  await db.user.create({
-    data: {
-      email: user.email,
-      username: user.name ?? "", // or derive from the profile
-      password: randomHashedPassword, // Save hashed password
+  ) {
+    // If there's no email, we can't create an account in your DB
+    if (!user?.email) {
+      console.warn("No email found for user:", user);
+      return;
+    }
+    console.log("PRINTTESTTEST")
+    await fetch(`${process.env.API_URL}/api/users/ensure`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Internal-Key": process.env.INTERNAL_API_KEY!,
     },
+    body: JSON.stringify({ email: user.email, name: user.name }),
   });
 }
 

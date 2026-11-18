@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "buLh/JUwqwU=",
+  "dgSpecHash": "kOvPxm31DtQ=",
   "success": true,
   "projectFilePath": "C:\\Users\\Rasmus\\Documents\\projects\\Booky\\Booky.Api\\Booky.Api.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\Rasmus\\.nuget\\packages\\bcrypt.net-next\\4.2.0\\bcrypt.net-next.4.2.0.nupkg.sha512",
     "C:\\Users\\Rasmus\\.nuget\\packages\\humanizer.core\\3.0.10\\humanizer.core.3.0.10.nupkg.sha512",
     "C:\\Users\\Rasmus\\.nuget\\packages\\microsoft.aspnetcore.openapi\\11.0.0\\microsoft.aspnetcore.openapi.11.0.0.nupkg.sha512",
     "C:\\Users\\Rasmus\\.nuget\\packages\\microsoft.build.framework\\18.9.6\\microsoft.build.framework.18.9.6.nupkg.sha512",
