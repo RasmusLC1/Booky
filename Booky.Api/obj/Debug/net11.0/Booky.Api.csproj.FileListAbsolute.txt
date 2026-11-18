@@ -168,3 +168,4 @@ C:\Users\Rasmus\Documents\projects\Booky\Booky.Api\obj\Debug\net11.0\refint\Book
 C:\Users\Rasmus\Documents\projects\Booky\Booky.Api\obj\Debug\net11.0\Booky.Api.pdb
 C:\Users\Rasmus\Documents\projects\Booky\Booky.Api\obj\Debug\net11.0\Booky.Api.genruntimeconfig.cache
 C:\Users\Rasmus\Documents\projects\Booky\Booky.Api\obj\Debug\net11.0\ref\Booky.Api.dll
+C:\Users\Rasmus\Documents\projects\Booky\Booky.Api\bin\Debug\net11.0\BCrypt-Net-Next.dll

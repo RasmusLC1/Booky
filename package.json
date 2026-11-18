@@ -38,6 +38,7 @@
     "redis": "^4.7.0",
     "resend": "^4.0.1",
     "sanitize-html": "^2.14.0",
+    "server-only": "^0.0.1",
     "stripe": "^17.4.0",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",

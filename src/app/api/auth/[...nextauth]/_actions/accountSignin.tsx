@@ -32,17 +32,22 @@ export async function loginVerification(formData: FormData) {
   };
 
   // 3. Check if user exists
-  const existingUser = await db.user.findFirst({
-    where: { email: data.email },
+  const res = await fetch(`${process.env.API_URL}/api/users/verify-login`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "X-Internal-Key": process.env.INTERNAL_API_KEY!,
+  },
+  body: JSON.stringify(data), // { email, password }
   });
-  if (!existingUser) {
-    return { error: { email: "Email does not exist" } };
-  }
+
 
   // 4. Verify password
-  const isValid = await bcrypt.compare(data.password, existingUser.password);
-  if (!isValid) {
-    return { error: { password: "Invalid password" } };
+  if (!res.ok) {
+  const body = await res.json().catch(() => null);
+  return body?.error && typeof body.error === "object"
+    ? { error: body.error }                 // { email: "..." } or { password: "..." }
+    : { error: { email: "Something went wrong" } };
   }
 
   return { success: true };
