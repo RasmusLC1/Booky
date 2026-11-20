@@ -37,8 +37,8 @@ async function ProductsSuspense() {
     <div>
       <ProductsClient
         products={products}
+        variant="catalog"
         searchHeading="Search"
-        renderItem={(product) => <ProductCard {...product} />}
       />
     </div>
   );
