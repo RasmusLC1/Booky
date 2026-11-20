@@ -80,3 +80,24 @@ public class PasswordReset
     public DateTime ExpiresAt { get; set; }
     public User User { get; set; } = null!;
 }
+public class ProductDto
+{
+    public string Id { get; set; } = "";
+    public string Name { get; set; } = "";
+    public string Author { get; set; } = "";
+    public int PriceInCents { get; set; }
+    public string ImagePath { get; set; } = "";
+    public string Description { get; set; } = "";
+    public string Category { get; set; } = "";
+    public int Length { get; set; }
+    public bool IsAvailableForPurchase { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+}
+
+public class DownloadPayload
+{
+    public byte[] Bytes { get; set; } = [];
+    public string ContentType { get; set; } = "application/octet-stream";
+    public string FileName { get; set; } = "";
+}
