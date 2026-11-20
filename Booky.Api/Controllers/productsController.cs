@@ -22,6 +22,10 @@ public class ProductsController(ProductService products) : ControllerBase
         return Ok(product);
     }
 
+    [HttpGet("all")]
+    public async Task<IActionResult> All(CancellationToken ct = default)
+        => Ok(await products.GetAllAsync(ct));
+
     [HttpGet("{id}/download")]
     public async Task<IActionResult> Download(string id, CancellationToken ct = default)
     {

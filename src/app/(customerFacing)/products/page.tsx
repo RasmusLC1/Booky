@@ -1,14 +1,12 @@
-import {  ProductCardSkeleton } from "@/components/ui/ProductCard";
-import db from "@/db/db";
+import { ProductCard, ProductCardSkeleton } from "@/components/ui/ProductCard";
 import { Suspense } from "react";
-import {cache} from "@/lib/cache"
-import ProductsClient from "./_components/ProductsClient";
-
+import { cache } from "@/lib/cache";
+import { fetchAllProducts } from "@/lib/products";
+import ProductsClient from "@/components/catalog/ProductsClient";
 
 export default function ProductsPage() {
   return (
     <div suppressHydrationWarning>
-      {/* {While function is waiting to load it loads 6 product card skeletons as placeholders} */}
       <Suspense
         fallback={
           <>
@@ -21,25 +19,27 @@ export default function ProductsPage() {
           </>
         }
       >
-        <ProductsSuspense/>
+        <ProductsSuspense />
       </Suspense>
     </div>
   );
 }
 
-const getProducts = cache(() => {
-  return db.product.findMany({
-    where: { isAvailableForPurchase: true },
-    orderBy: { name: "asc" },
-  });
-}, ["/products", "getProducts"], {revalidate: 60 * 60 * 2})
-
+const getProducts = cache(
+  () => fetchAllProducts(),
+  ["/products", "getProducts"],
+  { revalidate: 60 * 60 * 2 }
+);
 
 async function ProductsSuspense() {
   const products = await getProducts();
   return (
     <div>
-      <ProductsClient products={products}/>
+      <ProductsClient
+        products={products}
+        searchHeading="Search"
+        renderItem={(product) => <ProductCard {...product} />}
+      />
     </div>
   );
 }

@@ -2,10 +2,9 @@ import React, { Suspense } from "react";
 import { getServerSession, Session } from "next-auth";
 import { redirect } from "next/navigation";
 import { ProductCardSkeleton } from "@/components/ProductCard";
-import ProductsClient from "./_components/ProductsClient";
-import { fetchMyOrders } from "@/lib/products";
-import { type Product } from "@/lib/products";
-
+import { DownloadProduct } from "@/components/DownloadProductCard";
+import ProductsClient from "@/components/catalog/ProductsClient";
+import { fetchMyOrders, type Product } from "@/lib/products";
 
 export default async function MyOrdersPage() {
   const session = await getServerSession();
@@ -32,8 +31,6 @@ export default async function MyOrdersPage() {
   );
 }
 
-
-
 async function ProductsSuspense({ session }: { session: Session }) {
   if (!session.user || !session.user.email || !session.user.name) {
     return <p>No orders found.</p>;
@@ -50,13 +47,20 @@ async function ProductsSuspense({ session }: { session: Session }) {
     return <p>No orders found.</p>;
   }
 
-  const products = Array.from(
+  const products: Product[] = Array.from(
     new Map(orders.map((order) => [order.product.id, order.product])).values()
   );
 
   return (
     <div suppressHydrationWarning className="space-y-4">
-      <ProductsClient products={products} email={session.user.email} username={session.user.name} />
+      <ProductsClient
+        products={products}
+        email={session.user.email}
+        username={session.user.name}
+        showOrderHistoryButton
+        searchHeading="Search through your orders"
+        renderItem={(product) => <DownloadProduct {...product} />}
+      />
     </div>
   );
 }
