@@ -1,30 +1,22 @@
 import { Button } from "@/components/ui/button";
 import { ProductCard, ProductCardSkeleton } from "@/components/ui/ProductCard";
-import db from "@/db/db";
-import { Product } from "@prisma/client";
+import { type Product, fetchMostPopular, fetchNewest } from "@/lib/products";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
-import {cache} from "@/lib/cache"
+import { cache } from "@/lib/cache"
 
-// Find the orders that are available for purchase
-// Orders them by order count
-// Shows the first 3
-const getMostPopularProducts = cache(() => {
-  return db.product.findMany({
-    where: { isAvailableForPurchase: true },
-    orderBy: { orders: { _count: "desc" } },
-    take: 3,
-  });
-}, ["/", "getMostPopularProducts"], {revalidate: 60 * 60 * 2}) // homepage so just / and name for that section of the page, refresh every 24 hours
+const getMostPopularProducts = cache(
+  fetchMostPopular,
+  ["/", "getMostPopularProducts"],
+  { revalidate: 60 * 60 * 2 }
+)
 
-const getNewestProducts = cache(() => {
-  return db.product.findMany({
-    where: { isAvailableForPurchase: true },
-    orderBy: { createdAt: "desc" },
-    take: 3,
-  });
-}, ["/", "getNewestProducts"], {revalidate: 60 * 60 * 2})
+const getNewestProducts = cache(
+  fetchNewest,
+  ["/", "getNewestProducts"],
+  { revalidate: 60 * 60 * 2 }
+)
 
 export default function HomePage() {
   return (
