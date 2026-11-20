@@ -1,29 +1,35 @@
-import { NextRequest, NextResponse } from 'next/server';
-import db from '@/db/db';
-import { getUserIdFromSession } from '@/app/actions/getUserID';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
 
 export async function GET(request: NextRequest) {
-  const productid = request.nextUrl.pathname.split('/').pop(); // Get the last segment of the path
+  const productid = request.nextUrl.pathname.split("/").pop();
 
-  const userid = await getUserIdFromSession();
+  const session = await getServerSession();
+  const email = session?.user?.email;
 
-  if (!productid || !userid) {
-    return NextResponse.json({ error: 'Product ID and User ID are required' }, { status: 400 });
+  if (!productid || !email) {
+    return NextResponse.json(
+      { error: "Product ID and User ID are required" },
+      { status: 400 }
+    );
   }
 
   try {
-    const review = await db.review.findFirst({
-      where: { productid: productid, userid: userid },
-      select: { rating: true },
-    });
+    const res = await fetch(
+      `${process.env.API_URL}/api/reviews/${encodeURIComponent(productid)}/mine`,
+      {
+        headers: {
+          "X-Internal-Key": process.env.INTERNAL_API_KEY!,
+          "X-User-Email": email,
+        },
+        cache: "no-store",
+      }
+    );
 
-    if (review) {
-      return NextResponse.json(review, { status: 200 });
-    }
-
-    return NextResponse.json({ error: 'Review not found' }, { status: 404 });
+    const data = await res.json().catch(() => ({ error: "Unexpected response" }));
+    return NextResponse.json(data, { status: res.status });
   } catch (error) {
     console.error("Error fetching review:", error);
-    return NextResponse.json({ error: 'Failed to fetch review' }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch review" }, { status: 500 });
   }
 }
