@@ -8,6 +8,7 @@ builder.Services.AddDbContext<AppDbContext>(o =>
     o.UseSqlite("Data Source=booky.db"));
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 builder.Services.AddSingleton<Validation>();
 

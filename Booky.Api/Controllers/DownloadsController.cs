@@ -102,7 +102,8 @@ public class DownloadsController(AppDbContext db) : ControllerBase
                 Product = new ProductDto(
                     o.Product.Id, o.Product.Name, o.Product.Author, o.Product.PriceInCents,
                     o.Product.ImagePath, o.Product.Description, o.Product.Category,
-                    o.Product.Length, o.Product.IsAvailableForPurchase, o.Product.CreatedAt)
+                    o.Product.Length, o.Product.IsAvailableForPurchase, o.Product.CreatedAt,
+                    o.UpdatedAt)
             })
             .ToListAsync();
 
