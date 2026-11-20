@@ -1,22 +1,26 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import db from "@/db/db";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { token } = req.query;
 
-  // Find the token in the database
-  const resetRecord = await db.passwordReset.findUnique({
-    where: { token: token as string },
-  });
-
-  // Check if token exists and has not expired
-  if (!resetRecord || resetRecord.expiresAt < new Date()) {
+  if (typeof token !== "string" || !token) {
     return res.status(400).json({ error: "Invalid or expired token" });
   }
 
-  // If valid, proceed with password reset
-  res.status(200).json({ message: "Token is valid" });
+  try {
+    const response = await fetch(`${process.env.API_URL}/api/password-reset/validate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Internal-Key": process.env.INTERNAL_API_KEY!,
+      },
+      body: JSON.stringify({ token }),
+    });
+
+    const data = await response.json().catch(() => ({ error: "Unexpected response" }));
+    return res.status(response.status).json(data);
+  } catch (error) {
+    console.error("Error validating reset token:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
 }
