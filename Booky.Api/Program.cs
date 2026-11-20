@@ -1,5 +1,3 @@
-using System.Security.Cryptography;
-using System.Text;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +7,7 @@ builder.Services.AddDbContext<AppDbContext>(o =>
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<DownloadService>();
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 builder.Services.AddSingleton<Validation>();
