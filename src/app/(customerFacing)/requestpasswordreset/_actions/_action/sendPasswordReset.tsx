@@ -27,7 +27,7 @@ export async function sendPasswordResetEmail(
   const user = await db.user.findUnique({
     where: { email: result.data },
     select: {
-      id: true,        // ✅ Make sure to include the ID
+      id: true,        
       email: true,
       username: true,
     },
