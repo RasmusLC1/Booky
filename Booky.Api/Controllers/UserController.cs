@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 public record LoginRequest(string? Email, string? Password);
 public record EnsureUserRequest(string? Email, string? Name);
+public record ResetPasswordRequest(string? Token, string? NewPassword);
 
 [ApiController]
 [Route("api/users")]
@@ -43,5 +44,19 @@ public class UsersController(UserService users) : ControllerBase
         return result.Success
             ? Ok(new { success = true })
             : Conflict(new { error = result.Errors });
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword(ResetPasswordRequest req, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(req.Token) || string.IsNullOrEmpty(req.NewPassword))
+        {
+            return BadRequest(new { error = new { token = "Token and new password are required" } });
+        }
+
+        var result = await users.ResetPasswordAsync(req.Token, req.NewPassword, ct);
+        return result.Success
+            ? Ok(new { success = true, message = "Your password has been reset successfully!" })
+            : BadRequest(new { error = result.Errors });
     }
 }
