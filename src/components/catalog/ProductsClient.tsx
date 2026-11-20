@@ -8,9 +8,11 @@ import { emailOrderHistory } from "@/actions/orders";
 import type { Product } from "@/lib/products";
 import "./productClient.css";
 
+export type CatalogVariant = "catalog" | "orders";
+
 interface ProductsClientProps {
   products: Product[];
-  renderItem: (product: Product) => React.ReactNode;
+  variant: CatalogVariant;
   searchHeading?: string;
   email?: string;
   username?: string;
@@ -19,7 +21,7 @@ interface ProductsClientProps {
 
 export default function ProductsClient({
   products,
-  renderItem,
+  variant,
   searchHeading = "Search",
   email,
   username,
@@ -86,7 +88,7 @@ export default function ProductsClient({
 
       <ProductsSearch
         products={filteredProducts}
-        renderItem={renderItem}
+        variant={variant}
         heading={searchHeading}
       />
     </div>

@@ -48,6 +48,21 @@ export async function fetchMyOrders(): Promise<OrderWithProduct[]> {
   return res.json()
 }
 
+export async function fetchProductById(id: string): Promise<Product | null> {
+  const res = await fetch(
+    `${process.env.API_URL}/api/products/specific?id=${encodeURIComponent(id)}`,
+    {
+      headers: { "X-Internal-Key": process.env.INTERNAL_API_KEY! },
+      cache: "no-store",
+    }
+  )
+
+  if (res.status === 404) return null
+  if (!res.ok) throw new Error(`Products API returned ${res.status}`)
+
+  return res.json()
+}
+
 export const fetchMostPopular = () => fetchProducts("popular?take=3")
 export const fetchNewest = () => fetchProducts("newest?take=3")
 export const fetchAllProducts = () => fetchProducts("all")
