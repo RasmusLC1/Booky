@@ -141,4 +141,34 @@ public class DownloadsController(AppDbContext db) : ControllerBase
             downloadVerificationId = tokens[o.Product.Id].Id
         }));
     }
+
+    [HttpGet("{verificationId}")]
+    public async Task<IActionResult> Download(string verificationId, CancellationToken ct = default)
+    {
+        var verification = await db.DownloadVerifications
+            .AsNoTracking()
+            .Where(v => v.Id == verificationId && v.ExpiresAt > DateTime.UtcNow)
+            .Select(v => new
+            {
+                v.Product.Name,
+                v.Product.FilePath
+            })
+            .FirstOrDefaultAsync(ct);
+
+        if (verification is null || string.IsNullOrWhiteSpace(verification.FilePath))
+            return NotFound();
+
+        using var httpClient = new HttpClient();
+        using var remoteRes = await httpClient.GetAsync(verification.FilePath, ct);
+        if (!remoteRes.IsSuccessStatusCode)
+            return NotFound();
+
+        var bytes = await remoteRes.Content.ReadAsByteArrayAsync(ct);
+        var extension = Path.GetExtension(verification.FilePath);
+        var safeName = string.Join("_", verification.Name.Split(Path.GetInvalidFileNameChars()));
+        var downloadName = string.IsNullOrEmpty(extension) ? safeName : $"{safeName}{extension}";
+
+        var contentType = remoteRes.Content.Headers.ContentType?.ToString() ?? "application/octet-stream";
+        return File(bytes, contentType, downloadName);
+    }
 }
