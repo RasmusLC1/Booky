@@ -1,10 +1,7 @@
 // createAccountIfNeeded.ts
 
 "use server";
-
-import db from "@/db/db";
 import { randomBytes } from "crypto";
-import bcrypt from "bcrypt";
 
 
 function generateRandomPassword(): string {

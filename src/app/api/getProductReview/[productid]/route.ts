@@ -1,22 +1,25 @@
-import { NextRequest, NextResponse } from 'next/server';
-import db from '@/db/db';
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
-  const productid = request.nextUrl.pathname.split('/').pop();
+  const productid = request.nextUrl.pathname.split("/").pop();
 
   if (!productid) {
-    return NextResponse.json({ error: 'Product ID is required' }, { status: 400 });
+    return NextResponse.json({ error: "Product ID is required" }, { status: 400 });
   }
 
   try {
-    const reviews = await db.review.findMany({
-      where: { productid: productid },
-      select: { rating: true },
-    });
+    const res = await fetch(
+      `${process.env.API_URL}/api/reviews/${encodeURIComponent(productid)}`, // Prevents weird IDs from changing URL
+      {
+        headers: { "X-Internal-Key": process.env.INTERNAL_API_KEY! },
+        cache: "no-store", // Prevent stale reviews
+      }
+    );
 
-    return NextResponse.json(reviews, { status: 200 });
+    const data = await res.json().catch(() => ({ error: "Unexpected response" }));
+    return NextResponse.json(data, { status: res.status });
   } catch (error) {
     console.error("Error fetching review:", error);
-    return NextResponse.json({ error: 'Failed to fetch review' }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch review" }, { status: 500 });
   }
 }
