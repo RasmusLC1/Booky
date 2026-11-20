@@ -52,6 +52,16 @@ public class ProductService(AppDbContext db, IHttpClientFactory httpClientFactor
             .FirstOrDefaultAsync(ct);
     }
 
+    public async Task<List<ProductDto>> GetAllAsync(CancellationToken ct = default)
+    {
+        return await db.Products
+            .AsNoTracking()
+            .Where(p => p.IsAvailableForPurchase)
+            .OrderBy(p => p.Name)
+            .Select(ToDto)
+            .ToListAsync(ct);
+    }
+
     public async Task<DownloadPayload?> GetDownloadAsync(string id, CancellationToken ct = default)
     {
         var product = await db.Products

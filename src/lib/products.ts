@@ -50,3 +50,4 @@ export async function fetchMyOrders(): Promise<OrderWithProduct[]> {
 
 export const fetchMostPopular = () => fetchProducts("popular?take=3")
 export const fetchNewest = () => fetchProducts("newest?take=3")
+export const fetchAllProducts = () => fetchProducts("all")
