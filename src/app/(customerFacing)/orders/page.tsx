@@ -1,64 +1,57 @@
-import React, { Suspense } from "react";
-import { getServerSession, Session } from "next-auth";
-import { redirect } from "next/navigation";
-import { ProductCardSkeleton } from "@/components/ProductCard";
-import ProductsClient from "@/components/catalog/ProductsClient";
-import { fetchMyOrders, type Product } from "@/lib/products";
+"use client";
 
-export default async function MyOrdersPage() {
-  const session = await getServerSession();
-  if (!session || !session.user) {
-    redirect("/login");
-  }
+import React from "react";
+import ProductsSearch from "@/components/catalog/SearchBar";
+import type { Product } from "@/lib/products";
 
-  return (
-    <div className="orders-page">
-      <Suspense
-        fallback={
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array(6)
-              .fill(null)
-              .map((_, i) => (
-                <ProductCardSkeleton key={i} />
-              ))}
-          </div>
-        }
-      >
-        <ProductsSuspense session={session} />
-      </Suspense>
-    </div>
-  );
+interface ProductsClientProps {
+  products: Product[];
+  variant?: "catalog" | "orders";
+  email?: string;
+  username?: string;
+  showOrderHistoryButton?: boolean;
+  searchHeading?: string;
 }
 
-async function ProductsSuspense({ session }: { session: Session }) {
-  if (!session.user || !session.user.email || !session.user.name) {
-    return <p>No orders found.</p>;
-  }
-
-  let orders: Awaited<ReturnType<typeof fetchMyOrders>> = [];
-  try {
-    orders = await fetchMyOrders();
-  } catch (error) {
-    console.error("Error fetching orders:", error);
-  }
-
-  if (orders.length === 0) {
-    return <p>No orders found.</p>;
-  }
-
-  const products: Product[] = Array.from(
-    new Map(orders.map((order) => [order.product.id, order.product])).values()
-  );
-
+export default function ProductsClient({
+  products,
+  variant = "catalog",
+  email,
+  username,
+  showOrderHistoryButton = false,
+  searchHeading = "Search",
+}: ProductsClientProps) {
   return (
-    <div suppressHydrationWarning className="space-y-4">
-      <ProductsClient
+    <div className="max-w-6xl mx-auto px-4 py-6 space-y-6">
+      {/* If you had a filter sidebar/bar or order history button, render it here */}
+      {showOrderHistoryButton && (
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">
+            {username ? `Orders for ${username}` : email}
+          </span>
+          {/* Order history toggle/modal button here */}
+        </div>
+      )}
+
+      <ProductsSearch
         products={products}
-        variant="orders"
-        email={session.user.email}
-        username={session.user.name}
-        showOrderHistoryButton
-        searchHeading="Search through your orders"
+        heading={searchHeading}
+        renderItem={(product: Product) => (
+          <div className="border rounded-lg p-4 space-y-2 bg-white shadow-sm">
+            {product.imagePath && (
+              <img
+                src={product.imagePath}
+                alt={product.name}
+                className="w-full h-44 object-cover rounded"
+              />
+            )}
+            <h3 className="font-semibold text-lg">{product.name}</h3>
+            <p className="text-sm text-muted-foreground">{product.author}</p>
+            <p className="text-sm font-medium">
+              ${(product.priceInCents / 100).toFixed(2)}
+            </p>
+          </div>
+        )}
       />
     </div>
   );

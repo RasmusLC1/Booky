@@ -5,23 +5,36 @@ import type { Product } from "@/lib/products";
 
 interface ProductsSearchProps {
   products: Product[];
-  renderItem: (product: Product) => React.ReactNode;
+  renderItem?: (product: Product) => React.ReactNode;
   heading?: string;
+}
+
+function defaultRenderItem(product: Product): React.ReactNode {
+  return (
+    <div className="border rounded p-4">
+      <h3 className="font-semibold">{product.name}</h3>
+      <p className="text-sm text-muted-foreground">{product.author}</p>
+    </div>
+  );
 }
 
 export default function ProductsSearch({
   products,
-  renderItem,
+  renderItem = defaultRenderItem,
   heading = "Search",
 }: ProductsSearchProps) {
   const [query, setQuery] = useState("");
   const normalizedQuery = query.trim().toLowerCase();
 
-  const filteredProducts = products.filter(
-    (product) =>
-      product.name.toLowerCase().includes(normalizedQuery) ||
-      product.author.toLowerCase().includes(normalizedQuery)
-  );
+  const safeProducts = Array.isArray(products) ? products : [];
+  const filteredProducts = safeProducts.filter((product) => {
+    if (!product) return false;
+    const name = product.name?.toLowerCase() ?? "";
+    const author = product.author?.toLowerCase() ?? "";
+    return name.includes(normalizedQuery) || author.includes(normalizedQuery);
+  });
+
+  const itemRenderer = typeof renderItem === "function" ? renderItem : defaultRenderItem;
 
   return (
     <div className="space-y-4">
@@ -30,7 +43,7 @@ export default function ProductsSearch({
 
         <input
           type="text"
-          className="border p-2 w-full md:w-1/2 block mx-auto"
+          className="border rounded-md px-3 py-2 w-full max-w-md block mx-auto"
           placeholder="Search for a product..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -39,7 +52,7 @@ export default function ProductsSearch({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProducts.map((product) => (
             <React.Fragment key={product.id}>
-              {renderItem(product)}
+              {itemRenderer(product)}
             </React.Fragment>
           ))}
         </div>

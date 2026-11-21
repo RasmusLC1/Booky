@@ -25,6 +25,14 @@ public sealed record AdminProductDto(
     int OrderCount
     );
 
+public sealed record AdminUserDto(
+    string Id,
+    string Email,
+    string Username,
+    int OrderCount,
+    long TotalSpentCents
+    );
+
 public class AdminService(AppDbContext db)
 {
     public async Task<AdminDashboardDto> GetDashboardStatsAsync(CancellationToken ct = default)
@@ -87,6 +95,20 @@ public class AdminService(AppDbContext db)
                 p.PriceInCents,
                 p.IsAvailableForPurchase,
                 p.Orders.Count))
+            .ToListAsync(ct);
+    }
+
+    public async Task<List<AdminUserDto>> GetAdminUsersAsync(CancellationToken ct = default)
+    {
+        return await db.Users
+            .AsNoTracking()
+            .OrderByDescending(u => u.CreatedAt)
+            .Select(u => new AdminUserDto(
+                u.Id,
+                u.Email,
+                u.Username,
+                u.Orders.Count,
+                u.Orders.Select(o => (long?)o.PriceInCents).Sum() ?? 0L))
             .ToListAsync(ct);
     }
 }
