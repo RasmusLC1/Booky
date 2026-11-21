@@ -223,4 +223,18 @@ public class DownloadService(AppDbContext db, IHttpClientFactory httpClientFacto
 
         return new DownloadFilePayload(bytes, contentType, downloadName);
     }
+
+    public async Task<bool> HasOrderAsync(
+        string email,
+        string productId,
+        CancellationToken ct = default)
+    {
+        var normalizedEmail = email.Trim().ToLowerInvariant();
+        if (string.IsNullOrEmpty(normalizedEmail) || string.IsNullOrWhiteSpace(productId))
+            return false;
+
+        return await db.Orders
+            .AsNoTracking()
+            .AnyAsync(o => o.ProductId == productId && o.User.Email == normalizedEmail, ct);
+    }
 }

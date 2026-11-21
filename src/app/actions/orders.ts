@@ -1,8 +1,30 @@
-"use server"
+"use server";
 
-import db from "@/db/db"
+export async function userOrderExists(
+  email: string,
+  productId: string
+): Promise<boolean> {
+  if (!email.trim() || !productId.trim()) return false;
 
-// Checks if there already this product id on the user email, to check if user has already bought this
-export async function userOrderExists(email: string, productid: string){
-    return (await db.order.findFirst({where: {user: {email}, productid}, select: {id: true}})) != null
+  const params = new URLSearchParams({
+    email: email.trim(),
+    productId: productId.trim(),
+  });
+
+  const res = await fetch(
+    `${process.env.API_URL}/api/downloads/exists?${params.toString()}`,
+    {
+      headers: {
+        "X-Internal-Key": process.env.INTERNAL_API_KEY!,
+      },
+      cache: "no-store",
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error(`Failed to check order existence: ${res.status}`);
+  }
+
+  const data: { exists: boolean } = await res.json();
+  return data.exists;
 }

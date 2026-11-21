@@ -1,5 +1,24 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+public sealed record CreateProductRequest(
+    string Name,
+    string Author,
+    string Description,
+    string Category,
+    int PriceInCents,
+    string FilePath,
+    string ImagePath
+    );
+
+public sealed record UpdateProductRequest(
+    string Name,
+    string Author,
+    string Description,
+    string Category,
+    int PriceInCents,
+    string? FilePath,
+    string? ImagePath
+);
 
 public class ProductService(AppDbContext db, IHttpClientFactory httpClientFactory)
 {
@@ -93,5 +112,71 @@ public class ProductService(AppDbContext db, IHttpClientFactory httpClientFactor
             ContentType = contentType,
             FileName = $"{product.Name}{ext}"
         };
+    }
+    public async Task<string> CreateAsync(CreateProductRequest req, CancellationToken ct = default)
+    {
+        var product = new Product
+        {
+            Id = Guid.NewGuid().ToString(),
+            IsAvailableForPurchase = false,
+            Name = req.Name.Trim(),
+            Author = req.Author.Trim(),
+            Description = req.Description.Trim(),
+            Category = req.Category.Trim(),
+            PriceInCents = req.PriceInCents,
+            FilePath = req.FilePath,
+            ImagePath = req.ImagePath,
+            Length = 0
+        };
+
+        db.Products.Add(product);
+        await db.SaveChangesAsync(ct);
+        return product.Id;
+    }
+
+    public async Task<bool> SetAvailabilityAsync(
+        string id,
+        bool isAvailableForPurchase,
+        CancellationToken ct = default)
+    {
+        var updated = await db.Products
+            .Where(p => p.Id == id)
+            .ExecuteUpdateAsync(s => s.SetProperty(p => p.IsAvailableForPurchase, isAvailableForPurchase), ct);
+
+        return updated > 0;
+    }
+
+    public async Task<bool> DeleteAsync(string id, CancellationToken ct = default)
+    {
+        var deleted = await db.Products
+            .Where(p => p.Id == id)
+            .ExecuteDeleteAsync(ct);
+
+        return deleted > 0;
+    }
+
+    public async Task<bool> UpdateAsync(
+        string id,
+        UpdateProductRequest req,
+        CancellationToken ct = default)
+    {
+        var product = await db.Products.FirstOrDefaultAsync(p => p.Id == id, ct);
+        if (product is null)
+            return false;
+
+        product.Name = req.Name.Trim();
+        product.Author = req.Author.Trim();
+        product.Description = req.Description.Trim();
+        product.Category = req.Category.Trim();
+        product.PriceInCents = req.PriceInCents;
+
+        if (!string.IsNullOrWhiteSpace(req.FilePath))
+            product.FilePath = req.FilePath;
+
+        if (!string.IsNullOrWhiteSpace(req.ImagePath))
+            product.ImagePath = req.ImagePath;
+
+        await db.SaveChangesAsync(ct);
+        return true;
     }
 }
