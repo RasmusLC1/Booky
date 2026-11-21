@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
 
@@ -5,6 +6,13 @@ public record LoginResult(bool Success, string? Field = null, string? Error = nu
 
 public class UserService(AppDbContext db)
 {
+    private static readonly Expression<Func<User, UserDto>> ToDto = u => new UserDto
+    {
+        Id = u.Id,
+        Email = u.Email,
+        Username = u.Username,
+        CreatedAt = u.CreatedAt
+    };
     public async Task<LoginResult> VerifyLoginAsync(string email, string password)
     {
         email = email.Trim().ToLowerInvariant();
@@ -73,44 +81,17 @@ public class UserService(AppDbContext db)
 
         return new(true);
     }
-    public record ResetPasswordResult(bool Success, Dictionary<string, string>? Errors = null);
 
-    public async Task<ResetPasswordResult> ResetPasswordAsync(
-        string token,
-        string newHashedPassword,
-        CancellationToken cancellationToken = default)
+    public async Task<UserDto?> GetByEmailAsync(string email, CancellationToken ct = default)
     {
+        var normalizedEmail = email.Trim().ToLowerInvariant();
+        if (string.IsNullOrEmpty(normalizedEmail))
+            return null;
 
-
-        var errors = new Dictionary<string, string>();
-
-        var resetRecord = await db.PasswordResets
-            .FirstOrDefaultAsync(r => r.Token == token, cancellationToken);
-
-        if (resetRecord is null || resetRecord.ExpiresAt <= DateTime.UtcNow)
-        {
-            errors["token"] = "Invalid or expired token";
-            return new(false, errors);
-        }
-
-        var user = await db.Users
-        .FirstOrDefaultAsync(u => u.Id == resetRecord.UserId, cancellationToken);
-        
-        if (user is null)
-        {
-            errors["user"] = "User not found.";
-            return new(false, errors);
-        }
-
-        await using var tx = await db.Database.BeginTransactionAsync(cancellationToken);
-
-        user.Password = newHashedPassword;
-        db.PasswordResets.Remove(resetRecord);
-        
-        await db.SaveChangesAsync(cancellationToken);
-        await tx.CommitAsync(cancellationToken);
-        
-        return new(true);
-        
+        return await db.Users
+            .AsNoTracking()
+            .Where(u => u.Email == normalizedEmail)
+            .Select(ToDto)
+            .FirstOrDefaultAsync(ct);
     }
 }
