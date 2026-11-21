@@ -17,4 +17,18 @@ public class AdminController(AdminService adminService) : ControllerBase
         var deleted = await adminService.DeleteOrderAsync(id, ct);
         return deleted ? NoContent() : NotFound();
     }
+
+    [HttpGet("orders")]
+    public async Task<IActionResult> Orders(CancellationToken ct = default)
+    {
+        var orders = await adminService.GetOrdersAsync(ct);
+        return Ok(orders);
+    }
+
+    [HttpGet("products")]
+    public async Task<IActionResult> Products(CancellationToken ct = default)
+    {
+        var items = await adminService.GetAdminProductsAsync(ct);
+        return Ok(items);
+    }
 }

@@ -153,6 +153,7 @@ public class DownloadService(AppDbContext db, IHttpClientFactory httpClientFacto
                     Name = o.Product.Name,
                     Author = o.Product.Author,
                     PriceInCents = o.Product.PriceInCents,
+                    FilePath = o.Product.FilePath,
                     ImagePath = o.Product.ImagePath,
                     Description = o.Product.Description,
                     Category = o.Product.Category,

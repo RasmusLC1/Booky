@@ -28,6 +28,7 @@ public class ProductService(AppDbContext db, IHttpClientFactory httpClientFactor
         Name = p.Name,
         Author = p.Author,
         PriceInCents = p.PriceInCents,
+        FilePath = p.FilePath,
         ImagePath = p.ImagePath,
         Description = p.Description,
         Category = p.Category,
