@@ -48,4 +48,17 @@ public class DownloadsController(DownloadService downloadService) : ControllerBa
 
         return File(payload.Bytes, payload.ContentType, payload.FileName);
     }
+
+    [HttpGet("exists")]
+    public async Task<IActionResult> Exists(
+        [FromQuery] string? email,
+        [FromQuery] string? productId,
+        CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(productId))
+            return BadRequest(new { error = "Email and productId are required" });
+
+        var exists = await downloadService.HasOrderAsync(email, productId, ct);
+        return Ok(new { exists });
+    }
 }

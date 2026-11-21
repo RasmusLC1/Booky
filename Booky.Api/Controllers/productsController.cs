@@ -32,4 +32,46 @@ public class ProductsController(ProductService products) : ControllerBase
         var file = await products.GetDownloadAsync(id, ct);
         return file is null ? NotFound() : File(file.Bytes, file.ContentType, file.FileName);
     }
+
+    [HttpPost]
+    public async Task<IActionResult> Create(CreateProductRequest req, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(req.Name) || string.IsNullOrWhiteSpace(req.Author)
+            || string.IsNullOrWhiteSpace(req.Description) || string.IsNullOrWhiteSpace(req.Category))
+        {
+            return BadRequest(new { error = "All product fields are required." });
+        }
+
+        var id = await products.CreateAsync(req, ct);
+        return CreatedAtAction(nameof(Specific), new { id }, new { id });
+    }
+
+    public record SetAvailabilityRequest(bool IsAvailableForPurchase);
+
+    [HttpPatch("{id}/availability")]
+    public async Task<IActionResult> SetAvailability(
+        string id,
+        SetAvailabilityRequest req,
+        CancellationToken ct = default)
+    {
+        var updated = await products.SetAvailabilityAsync(id, req.IsAvailableForPurchase, ct);
+        return updated ? NoContent() : NotFound();
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(
+        string id,
+        UpdateProductRequest req,
+        CancellationToken ct = default)
+    {
+        var updated = await products.UpdateAsync(id, req, ct);
+        return updated ? NoContent() : NotFound();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(string id, CancellationToken ct = default)
+    {
+        var deleted = await products.DeleteAsync(id, ct);
+        return deleted ? NoContent() : NotFound();
+    }
 }
