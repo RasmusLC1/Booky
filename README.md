@@ -80,3 +80,7 @@ npm run email
 ```
 
 This serves emails from the src/email directory on port 3001.
+
+
+7. Setting Admin password
+Add a console log to isValidPassword to see the password being sent and add it to .env

@@ -1,42 +1,42 @@
-import db from "@/db/db";
 import { notFound } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
-  req: NextRequest,
+  _req: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  // Await the params to resolve it
   const { id } = await context.params;
 
-  // Select the filepath and name based on id
-  const product = await db.product.findUnique({
-    where: { id },
-    select: { filePath: true, name: true },
-  });
+  const res = await fetch(
+    `${process.env.API_URL}/api/products/${encodeURIComponent(id)}/download`,
+    {
+      headers: {
+        "X-Internal-Key": process.env.INTERNAL_API_KEY!,
+      },
+      cache: "no-store",
+    }
+  );
 
-  if (product == null) return notFound();
+  if (res.status === 404) return notFound();
 
-   // Fetch the file from the remote URL
-   const response = await fetch(product.filePath);
+  if (!res.ok) {
+    return NextResponse.json(
+      { error: "Failed to download file" },
+      { status: res.status }
+    );
+  }
 
-   if (!response.ok) {
-     console.error(`Failed to fetch file: ${response.statusText}`);
-     return notFound();
-   }
- 
+  const headers = new Headers();
+  const contentType = res.headers.get("content-type");
+  const contentDisposition = res.headers.get("content-disposition");
+  const contentLength = res.headers.get("content-length");
 
-  // Use arrayBuffer and convert to Buffer
-  const arrayBuffer = await response.arrayBuffer();
-  const fileBuffer = Buffer.from(arrayBuffer); // Convert ArrayBuffer to Buffer
-  const fileSize = response.headers.get("content-length"); // Get file size
-  const extension = product.filePath.split(".").pop(); // Get file extension
+  if (contentType) headers.set("Content-Type", contentType);
+  if (contentDisposition) headers.set("Content-Disposition", contentDisposition);
+  if (contentLength) headers.set("Content-Length", contentLength);
 
-  // Handle the server response for downloading the file
-  return new NextResponse(fileBuffer, {
-    headers: {
-      "Content-Disposition": `attachment; filename="${product.name}.${extension}"`,
-      "Content-Length": fileSize || fileBuffer.length.toString(), // Fallback to buffer size if header is missing
-    },
+  return new NextResponse(res.body, {
+    status: 200,
+    headers,
   });
 }

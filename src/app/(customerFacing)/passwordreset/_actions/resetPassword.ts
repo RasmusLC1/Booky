@@ -1,12 +1,10 @@
 "use server";
 
-import db from "@/db/db";
 import bcrypt from "bcrypt";
 import { z } from "zod";
 
-// Validation schema for token and password
 const resetPasswordSchema = z.object({
-  token: z.string().nonempty("Token is required"),
+  token: z.string().trim().min(1, "Token is required"),
   password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
@@ -21,36 +19,54 @@ export async function sendPasswordReset(formData: FormData): Promise<{
 
   if (!result.success) {
     const fieldErrors: Record<string, string> = {};
-    result.error.issues.forEach((issue) => {
-      fieldErrors[issue.path[0]] = issue.message;
-    });
+    for (const issue of result.error.issues) {
+      const key = String(issue.path[0] ?? "password");
+      if (!fieldErrors[key]) {
+        fieldErrors[key] = issue.message;
+      }
+    }
     return { error: fieldErrors };
   }
 
   const { token, password } = result.data;
 
-  // Find the reset token in the database
-  const resetRecord = await db.passwordReset.findFirst({
-    where: { token },
-  });
+  const apiUrl = process.env.API_URL;
+  const apiKey = process.env.INTERNAL_API_KEY;
 
-  if (!resetRecord || resetRecord.expiresAt < new Date()) {
-    return { error: { token: "Invalid or expired token" } };
+  if (!apiUrl || !apiKey) {
+    return { error: { password: "Server configuration error" } };
   }
 
-  // Hash the new password
   const hashedPassword = await bcrypt.hash(password, 12);
 
-  // Update user's password
-  await db.user.update({
-    where: { id: resetRecord.userId },
-    data: { password: hashedPassword },
-  });
+  try {
+    const res = await fetch(`${apiUrl}/api/users/reset-password`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Internal-Key": apiKey,
+      },
+      body: JSON.stringify({
+        token,
+        newPassword: hashedPassword,
+      }),
+      cache: "no-store",
+    });
 
-  // Delete the token from the database
-  await db.passwordReset.delete({
-    where: { id: resetRecord.id },
-  });
+    const body = await res.json().catch(() => null);
 
-  return { message: "Your password has been reset successfully!" };
+    if (!res.ok) {
+      if (body?.error && typeof body.error === "object") {
+        return { error: body.error as Record<string, string> };
+      }
+      return { error: { token: "Invalid or expired token" } };
+    }
+
+    return {
+      message: body?.message ?? "Your password has been reset successfully!",
+    };
+  } catch (err) {
+    console.error("Error calling reset-password endpoint:", err);
+    return { error: { password: "Something went wrong. Please try again." } };
+  }
 }

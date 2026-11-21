@@ -1,5 +1,5 @@
 "use client";
-import "./loginform.css"; // Ensure this has the centering styles
+import "./loginform.css"; 
 import { signIn } from "next-auth/react";
 import React, { useState } from "react";
 import Link from "next/link";
