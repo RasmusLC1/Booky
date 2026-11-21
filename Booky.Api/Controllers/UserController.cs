@@ -1,13 +1,13 @@
-// Controllers/UsersController.cs
 using Microsoft.AspNetCore.Mvc;
 
 public record LoginRequest(string? Email, string? Password);
 public record EnsureUserRequest(string? Email, string? Name);
 public record ResetPasswordRequest(string? Token, string? NewPassword);
+public record RegisterRequest(string? Email, string? Username, string? Password);
 
 [ApiController]
 [Route("api/users")]
-public class UsersController(UserService users) : ControllerBase
+public class UsersController(UserService users, PasswordResetService passwordReset) : ControllerBase
 {
     [HttpPost("verify-login")]
     public async Task<IActionResult> VerifyLogin(LoginRequest req)
@@ -31,8 +31,6 @@ public class UsersController(UserService users) : ControllerBase
         return Ok(new { success = true });
     }
 
-    public record RegisterRequest(string? Email, string? Username, string? Password);
-
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterRequest req)
     {
@@ -49,12 +47,13 @@ public class UsersController(UserService users) : ControllerBase
     [HttpPost("reset-password")]
     public async Task<IActionResult> ResetPassword(ResetPasswordRequest req, CancellationToken ct)
     {
-        if (string.IsNullOrWhiteSpace(req.Token) || string.IsNullOrEmpty(req.NewPassword))
+        if (string.IsNullOrWhiteSpace(req.Token) || string.IsNullOrEmpty(req.NewPassword)
+            || req.NewPassword.Length < 8)
         {
-            return BadRequest(new { error = new { token = "Token and new password are required" } });
+            return BadRequest(new { error = new { token = "Token and password (min 8 chars) are required" } });
         }
 
-        var result = await users.ResetPasswordAsync(req.Token, req.NewPassword, ct);
+        var result = await passwordReset.ResetPasswordAsync(req.Token, req.NewPassword, ct);
         return result.Success
             ? Ok(new { success = true, message = "Your password has been reset successfully!" })
             : BadRequest(new { error = result.Errors });

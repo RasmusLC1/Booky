@@ -8,6 +8,7 @@ builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<DownloadService>();
+builder.Services.AddScoped<PasswordResetService>();
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 builder.Services.AddSingleton<Validation>();

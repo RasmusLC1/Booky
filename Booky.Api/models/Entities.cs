@@ -1,4 +1,3 @@
-// Models/Entities.cs
 public interface ITimestamped { DateTime UpdatedAt { get; set; } }
 
 public class Product : ITimestamped
@@ -21,6 +20,22 @@ public class Product : ITimestamped
     public List<DownloadVerification> DownloadVerifications { get; set; } = [];
 }
 
+public class ProductDto
+{
+    public string Id { get; set; } = "";
+    public string Name { get; set; } = "";
+    public string Author { get; set; } = "";
+    public int PriceInCents { get; set; }
+    public string ImagePath { get; set; } = "";
+    public string Description { get; set; } = "";
+    public string Category { get; set; } = "";
+    public int Length { get; set; }
+    public bool IsAvailableForPurchase { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+}
+
+
 public class User : ITimestamped
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
@@ -33,6 +48,14 @@ public class User : ITimestamped
     public List<Order> Orders { get; set; } = [];
     public List<PasswordReset> PasswordResets { get; set; } = [];
     public List<Review> Reviews { get; set; } = [];
+}
+
+public class UserDto
+{
+    public string Id { get; set; } = "";
+    public string Email { get; set; } = "";
+    public string Username { get; set; } = "";
+    public DateTime CreatedAt { get; set; }
 }
 
 public class Order : ITimestamped
@@ -79,20 +102,6 @@ public class PasswordReset
     public string Token { get; set; } = "";
     public DateTime ExpiresAt { get; set; }
     public User User { get; set; } = null!;
-}
-public class ProductDto
-{
-    public string Id { get; set; } = "";
-    public string Name { get; set; } = "";
-    public string Author { get; set; } = "";
-    public int PriceInCents { get; set; }
-    public string ImagePath { get; set; } = "";
-    public string Description { get; set; } = "";
-    public string Category { get; set; } = "";
-    public int Length { get; set; }
-    public bool IsAvailableForPurchase { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
 }
 
 public class DownloadPayload

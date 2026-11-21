@@ -1,23 +1,20 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 public record ValidateTokenRequest(string? Token);
 
 [ApiController]
 [Route("api/password-reset")]
-public class PasswordResetController(AppDbContext db) : ControllerBase
+public class PasswordResetController(PasswordResetService passwordReset) : ControllerBase
 {
     [HttpPost("validate")]
-    public async Task<IActionResult> Validate(ValidateTokenRequest req)
+    public async Task<IActionResult> Validate(ValidateTokenRequest req, CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(req.Token))
             return BadRequest(new { error = "Invalid or expired token" });
 
-        var valid = await db.PasswordResets
-            .AsNoTracking()
-            .AnyAsync(p => p.Token == req.Token && p.ExpiresAt > DateTime.UtcNow);
+        var result = await passwordReset.ValidatePasswordResetAsync(req.Token, ct);
 
-        return valid
+        return result.Success
             ? Ok(new { message = "Token is valid" })
             : BadRequest(new { error = "Invalid or expired token" });
     }
