@@ -6,6 +6,7 @@ export type Product = {
   name: string;
   author: string;
   priceInCents: number;
+  downloadVerificationId?: string
   imagePath: string;
   description: string;
   category: string;

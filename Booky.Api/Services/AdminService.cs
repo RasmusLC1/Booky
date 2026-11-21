@@ -4,35 +4,6 @@ public sealed record SalesStatsDto(long TotalCents, int NumberOfSales);
 public sealed record CustomerStatsDto(int UserCount, long TotalOrderCents);
 public sealed record ProductStatsDto(int ActiveCount, int InactiveCount);
 
-public sealed record AdminDashboardDto(
-    SalesStatsDto Sales,
-    CustomerStatsDto Customers,
-    ProductStatsDto Products
-    );
-
-public sealed record AdminOrderDto(
-    string Id,
-    int PriceInCents,
-    string ProductName,
-    string UserEmail
-    );
-
-public sealed record AdminProductDto(
-    string Id,
-    string Name,
-    int PriceInCents,
-    bool IsAvailableForPurchase,
-    int OrderCount
-    );
-
-public sealed record AdminUserDto(
-    string Id,
-    string Email,
-    string Username,
-    int OrderCount,
-    long TotalSpentCents
-    );
-
 public class AdminService(AppDbContext db)
 {
     public async Task<AdminDashboardDto> GetDashboardStatsAsync(CancellationToken ct = default)
@@ -94,6 +65,7 @@ public class AdminService(AppDbContext db)
                 p.Name,
                 p.PriceInCents,
                 p.IsAvailableForPurchase,
+                p.FilePath,
                 p.Orders.Count))
             .ToListAsync(ct);
     }

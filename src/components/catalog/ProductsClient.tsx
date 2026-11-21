@@ -109,7 +109,9 @@ export default function ProductsClient({
             priceInCents={product.priceInCents}
             description={product.description}
             imagePath={product.imagePath}
-            {...(variant === "orders" ? { isOrdered: true } : {})}
+            downloadVerificationId={
+              variant === "orders" ? product.downloadVerificationId : undefined
+            }
           />
         )}
       />
