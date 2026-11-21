@@ -20,19 +20,20 @@ public class Product : ITimestamped
     public List<DownloadVerification> DownloadVerifications { get; set; } = [];
 }
 
-public class ProductDto
+public sealed record ProductDto
 {
-    public string Id { get; set; } = "";
-    public string Name { get; set; } = "";
-    public string Author { get; set; } = "";
-    public int PriceInCents { get; set; }
-    public string ImagePath { get; set; } = "";
-    public string Description { get; set; } = "";
-    public string Category { get; set; } = "";
-    public int Length { get; set; }
-    public bool IsAvailableForPurchase { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
+    public required string Id { get; init; }
+    public required string Name { get; init; }
+    public required string Author { get; init; }
+    public required int PriceInCents { get; init; }
+    public required string FilePath { get; init; }
+    public required string ImagePath { get; init; }
+    public required string Description { get; init; }
+    public required string Category { get; init; }
+    public required int Length { get; init; }
+    public required bool IsAvailableForPurchase { get; init; }
+    public required DateTime CreatedAt { get; init; }
+    public required DateTime UpdatedAt { get; init; }
 }
 
 

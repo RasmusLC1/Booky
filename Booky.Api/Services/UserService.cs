@@ -94,4 +94,16 @@ public class UserService(AppDbContext db)
             .Select(ToDto)
             .FirstOrDefaultAsync(ct);
     }
+
+    public async Task<bool> DeleteUser(string id, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(id))
+            return false;
+
+        var deleteRows = await db.Users
+                        .Where(u => u.Id == id)
+                        .ExecuteDeleteAsync(ct);
+
+        return deleteRows > 0;
+    }
 }

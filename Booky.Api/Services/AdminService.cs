@@ -7,7 +7,23 @@ public sealed record ProductStatsDto(int ActiveCount, int InactiveCount);
 public sealed record AdminDashboardDto(
     SalesStatsDto Sales,
     CustomerStatsDto Customers,
-    ProductStatsDto Products);
+    ProductStatsDto Products
+    );
+
+public sealed record AdminOrderDto(
+    string Id,
+    int PriceInCents,
+    string ProductName,
+    string UserEmail
+    );
+
+public sealed record AdminProductDto(
+    string Id,
+    string Name,
+    int PriceInCents,
+    bool IsAvailableForPurchase,
+    int OrderCount
+    );
 
 public class AdminService(AppDbContext db)
 {
@@ -45,5 +61,32 @@ public class AdminService(AppDbContext db)
             .ExecuteDeleteAsync(ct);
 
         return deletedRows > 0;
+    }
+
+    public async Task<List<AdminOrderDto>> GetOrdersAsync(CancellationToken ct = default)
+    {
+        return await db.Orders
+            .AsNoTracking()
+            .OrderByDescending(o => o.CreatedAt)
+            .Select(o => new AdminOrderDto(
+                o.Id,
+                o.PriceInCents,
+                o.Product.Name,
+                o.User.Email))
+            .ToListAsync(ct);
+}
+
+    public async Task<List<AdminProductDto>> GetAdminProductsAsync(CancellationToken ct = default)
+    {
+        return await db.Products
+            .AsNoTracking()
+            .OrderBy(p => p.Name)
+            .Select(p => new AdminProductDto(
+                p.Id,
+                p.Name,
+                p.PriceInCents,
+                p.IsAvailableForPurchase,
+                p.Orders.Count))
+            .ToListAsync(ct);
     }
 }

@@ -1,6 +1,5 @@
 import { PageHeader } from "../_components/PageHeader";
 import { Button } from "@/components/ui/button";
-import db from "@/db/db";
 import {
   Table,
   TableBody,
@@ -8,23 +7,44 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"; // Updated import
+} from "@/components/ui/table";
 import Link from "next/link";
 import { CheckCircle2, MoreVertical, XCircle } from "lucide-react";
 import { formatCurrency, formatNumber } from "@/lib/formatters";
 import {
   DropdownMenu,
-  DropdownMenuSeparator,
-} from "@radix-ui/react-dropdown-menu";
-import {
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
   ActiveToggleDropdownItem,
   DeleteDropdownItem,
 } from "./_components/ProductActions";
+
+interface AdminProductDto {
+  id: string;
+  name: string;
+  priceInCents: number;
+  isAvailableForPurchase: boolean;
+  orderCount: number;
+}
+
+async function getAdminProducts(): Promise<AdminProductDto[]> {
+  const res = await fetch(`${process.env.API_URL}/api/admin/products`, {
+    headers: {
+      "X-Internal-Key": process.env.INTERNAL_API_KEY!,
+    },
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch admin products: ${res.status}`);
+  }
+
+  return (await res.json()) as AdminProductDto[];
+}
 
 export default function AdminProductsPage() {
   return (
@@ -41,16 +61,7 @@ export default function AdminProductsPage() {
 }
 
 async function ProductsTable() {
-  const products = await db.product.findMany({
-    select: {
-      id: true,
-      name: true,
-      priceInCents: true,
-      isAvailableForPurchase: true,
-      _count: { select: { orders: true } },
-    },
-    orderBy: { name: "asc" },
-  });
+  const products = await getAdminProducts();
 
   if (products.length === 0) return <p>No products found</p>;
 
@@ -81,13 +92,13 @@ async function ProductsTable() {
               ) : (
                 <>
                   <span className="sr-only">Unavailable</span>
-                  <XCircle className = "stroke-destructive" />
+                  <XCircle className="stroke-destructive" />
                 </>
               )}
             </TableCell>
             <TableCell>{product.name}</TableCell>
             <TableCell>{formatCurrency(product.priceInCents / 100)}</TableCell>
-            <TableCell>{formatNumber(product._count.orders)}</TableCell>
+            <TableCell>{formatNumber(product.orderCount)}</TableCell>
             <TableCell>
               <DropdownMenu>
                 <DropdownMenuTrigger>
@@ -112,7 +123,7 @@ async function ProductsTable() {
                   <DropdownMenuSeparator />
                   <DeleteDropdownItem
                     id={product.id}
-                    disabled={product._count.orders > 0}
+                    disabled={product.orderCount > 0}
                   />
                 </DropdownMenuContent>
               </DropdownMenu>

@@ -69,4 +69,13 @@ public class UsersController(UserService users, PasswordResetService passwordRes
         var user = await users.GetByEmailAsync(email, ct);
         return user is null ? NotFound() : Ok(user);
     }
+
+    [HttpDelete("delete-user")]
+    public async Task<IActionResult> DeleteUser(string id, CancellationToken ct = default)
+    {
+        var deleted = await users.DeleteUser(id, ct);
+        return deleted
+            ? NoContent()
+            : NotFound();
+    }
 }
