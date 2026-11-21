@@ -1,19 +1,32 @@
 using Microsoft.EntityFrameworkCore;
 
-public sealed record DownloadFilePayload(byte[] Bytes, string ContentType, string FileName);
+public sealed class DownloadFilePayload(HttpResponseMessage response, Stream stream) : IDisposable
+{
+    public Stream Stream { get; } = stream;
+    public required string ContentType { get; init; }
+    public required string FileName { get; init; }
+
+    public void Dispose()
+    {
+        Stream.Dispose();
+        response.Dispose();
+    }
+}
 
 public sealed record OrderHistoryProductDto(
     string Id,
     string Name,
     string ImagePath,
-    string Description);
+    string Description
+    );
 
 public sealed record OrderHistoryItemDto(
     string Id,
     int PriceInCents,
     DateTime CreatedAt,
     OrderHistoryProductDto Product,
-    string DownloadVerificationId);
+    string DownloadVerificationId
+    );
 
 public sealed record OrderHistoryResponseDto(
     string Email,
@@ -153,7 +166,6 @@ public class DownloadService(AppDbContext db, IHttpClientFactory httpClientFacto
                     Name = o.Product.Name,
                     Author = o.Product.Author,
                     PriceInCents = o.Product.PriceInCents,
-                    FilePath = o.Product.FilePath,
                     ImagePath = o.Product.ImagePath,
                     Description = o.Product.Description,
                     Category = o.Product.Category,
@@ -208,23 +220,30 @@ public class DownloadService(AppDbContext db, IHttpClientFactory httpClientFacto
             })
             .FirstOrDefaultAsync(ct);
 
-        if (verification is null || string.IsNullOrWhiteSpace(verification.FilePath))
+        if (verification is null
+            || !Uri.TryCreate(verification.FilePath, UriKind.Absolute, out var fileUri))
             return null;
 
         var client = httpClientFactory.CreateClient();
-        using var remoteRes = await client.GetAsync(verification.FilePath, ct);
-        if (!remoteRes.IsSuccessStatusCode)
-            return null;
+        var remoteRes = await client.GetAsync(fileUri, HttpCompletionOption.ResponseHeadersRead, ct);
 
-        var bytes = await remoteRes.Content.ReadAsByteArrayAsync(ct);
-        var extension = Path.GetExtension(verification.FilePath);
+        if (!remoteRes.IsSuccessStatusCode)
+        {
+            remoteRes.Dispose();
+            return null;
+        }
+
+        var extension = Path.GetExtension(fileUri.AbsolutePath);
         var safeName = string.Join("_", verification.Name.Split(Path.GetInvalidFileNameChars()));
         var downloadName = string.IsNullOrEmpty(extension) ? safeName : $"{safeName}{extension}";
-        var contentType = remoteRes.Content.Headers.ContentType?.ToString() ?? "application/octet-stream";
 
-        return new DownloadFilePayload(bytes, contentType, downloadName);
+        return new DownloadFilePayload(remoteRes, await remoteRes.Content.ReadAsStreamAsync(ct))
+        {
+            ContentType = remoteRes.Content.Headers.ContentType?.ToString() ?? "application/octet-stream",
+            FileName = downloadName
+        };
     }
-
+    
     public async Task<bool> HasOrderAsync(
         string email,
         string productId,

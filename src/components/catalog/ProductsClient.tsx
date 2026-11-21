@@ -5,6 +5,7 @@ import ProductsSearch from "./SearchBar";
 import Filter from "./Filter";
 import { Button } from "@/components/ui/button";
 import { emailOrderHistory } from "@/actions/orders";
+import { ProductCard } from "@/components/ProductCard";
 import type { Product } from "@/lib/products";
 import "./productClient.css";
 
@@ -19,6 +20,11 @@ interface ProductsClientProps {
   showOrderHistoryButton?: boolean;
 }
 
+function toTimestampMs(value: string | Date): number {
+  const ms = new Date(value).getTime();
+  return Number.isNaN(ms) ? 0 : ms;
+}
+
 export default function ProductsClient({
   products,
   variant,
@@ -28,52 +34,57 @@ export default function ProductsClient({
   showOrderHistoryButton = false,
 }: ProductsClientProps) {
   const [filterOption, setFilterOption] = useState("newest");
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
 
   const handleEmailOrderHistory = async () => {
-    if (!email) return;
+    if (!email || isSendingEmail) return;
+    setIsSendingEmail(true);
     try {
       await emailOrderHistory(email);
       alert("Order history sent via email!");
     } catch (error) {
       console.error("Failed to send order history:", error, email);
       alert("Failed to send order history. Please try again.");
+    } finally {
+      setIsSendingEmail(false);
     }
   };
 
   const filteredProducts = useMemo(() => {
-    const withTimestamps = products.map((p) => ({
-      product: p,
-      createdAtMs: new Date(p.createdAt).getTime(),
-    }));
+    const safeProducts = Array.isArray(products) ? products : [];
 
     switch (filterOption) {
       case "newest":
-        return [...withTimestamps]
-          .sort((a, b) => b.createdAtMs - a.createdAtMs)
-          .map((item) => item.product);
+        return [...safeProducts].sort(
+          (a, b) => toTimestampMs(b.createdAt) - toTimestampMs(a.createdAt)
+        );
       case "oldest":
-        return [...withTimestamps]
-          .sort((a, b) => a.createdAtMs - b.createdAtMs)
-          .map((item) => item.product);
+        return [...safeProducts].sort(
+          (a, b) => toTimestampMs(a.createdAt) - toTimestampMs(b.createdAt)
+        );
       case "az":
-        return [...products].sort((a, b) => a.name.localeCompare(b.name));
+        return [...safeProducts].sort((a, b) => a.name.localeCompare(b.name));
       case "za":
-        return [...products].sort((a, b) => b.name.localeCompare(a.name));
+        return [...safeProducts].sort((a, b) => b.name.localeCompare(a.name));
       case "lowest":
-        return [...products].sort((a, b) => a.priceInCents - b.priceInCents);
+        return [...safeProducts].sort(
+          (a, b) => a.priceInCents - b.priceInCents
+        );
       case "highest":
-        return [...products].sort((a, b) => b.priceInCents - a.priceInCents);
+        return [...safeProducts].sort(
+          (a, b) => b.priceInCents - a.priceInCents
+        );
       default:
-        return products;
+        return safeProducts;
     }
   }, [products, filterOption]);
 
   return (
-    <div>
+    <div className="products-container max-w-6xl mx-auto space-y-6">
       {showOrderHistoryButton && email && (
         <div className="button-wrapper">
-          <Button onClick={handleEmailOrderHistory}>
-            Get Order History Via Email
+          <Button onClick={handleEmailOrderHistory} disabled={isSendingEmail}>
+            {isSendingEmail ? "Sending..." : "Get Order History Via Email"}
           </Button>
         </div>
       )}
@@ -81,15 +92,26 @@ export default function ProductsClient({
       <Filter onFilterSelect={setFilterOption} />
 
       {username && (
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-2">
           <h1 className="text-2xl font-bold">Welcome {username}</h1>
         </div>
       )}
 
       <ProductsSearch
         products={filteredProducts}
-        variant={variant}
         heading={searchHeading}
+        renderItem={(product: Product) => (
+          <ProductCard
+            key={product.id}
+            id={product.id}
+            name={product.name}
+            author={product.author}
+            priceInCents={product.priceInCents}
+            description={product.description}
+            imagePath={product.imagePath}
+            {...(variant === "orders" ? { isOrdered: true } : {})}
+          />
+        )}
       />
     </div>
   );

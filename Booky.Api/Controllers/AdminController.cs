@@ -31,4 +31,11 @@ public class AdminController(AdminService adminService) : ControllerBase
         var items = await adminService.GetAdminProductsAsync(ct);
         return Ok(items);
     }
+
+    [HttpGet("users")]
+    public async Task<IActionResult> Users(CancellationToken ct = default)
+    {
+        var users = await adminService.GetAdminUsersAsync(ct);
+        return Ok(users);
+    }
 }

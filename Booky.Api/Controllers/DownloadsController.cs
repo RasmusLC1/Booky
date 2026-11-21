@@ -46,7 +46,8 @@ public class DownloadsController(DownloadService downloadService) : ControllerBa
         if (payload is null)
             return NotFound();
 
-        return File(payload.Bytes, payload.ContentType, payload.FileName);
+        HttpContext.Response.RegisterForDispose(payload);
+        return File(payload.Stream, payload.ContentType, payload.FileName);
     }
 
     [HttpGet("exists")]

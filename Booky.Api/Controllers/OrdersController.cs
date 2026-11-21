@@ -27,4 +27,14 @@ public class OrdersController(OrderService orders, IConfiguration config) : Cont
             order = new { o.Id, o.ProductId, o.UserId, o.PriceInCents }
         });
     }
+
+    [HttpPost("fulfill")]
+    public async Task<IActionResult> Fulfill(FulfillOrderRequest req, CancellationToken ct = default)
+    {
+        var (data, error, statusCode) = await orders.FulfillOrderAsync(req, ct);
+        if (data is null)
+            return StatusCode(statusCode, new { message = error });
+
+        return StatusCode(statusCode, data);
+    }
 }

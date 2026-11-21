@@ -20,13 +20,12 @@ public class Product : ITimestamped
     public List<DownloadVerification> DownloadVerifications { get; set; } = [];
 }
 
-public sealed record ProductDto
+public record ProductDto
 {
     public required string Id { get; init; }
     public required string Name { get; init; }
     public required string Author { get; init; }
     public required int PriceInCents { get; init; }
-    public required string FilePath { get; init; }
     public required string ImagePath { get; init; }
     public required string Description { get; init; }
     public required string Category { get; init; }
@@ -36,6 +35,10 @@ public sealed record ProductDto
     public required DateTime UpdatedAt { get; init; }
 }
 
+public sealed record AdminProductDto : ProductDto
+{
+    public required string FilePath { get; init; }
+}
 
 public class User : ITimestamped
 {
