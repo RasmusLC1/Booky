@@ -1,3 +1,4 @@
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
 
 public record LoginRequest(string? Email, string? Password);
@@ -57,5 +58,15 @@ public class UsersController(UserService users, PasswordResetService passwordRes
         return result.Success
             ? Ok(new { success = true, message = "Your password has been reset successfully!" })
             : BadRequest(new { error = result.Errors });
+    }
+
+    [HttpGet("find-by-email")]
+    public async Task<IActionResult> FindByEmail([FromQuery] string? email, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            return BadRequest(new { error = "Email is required" });
+
+        var user = await users.GetByEmailAsync(email, ct);
+        return user is null ? NotFound() : Ok(user);
     }
 }
