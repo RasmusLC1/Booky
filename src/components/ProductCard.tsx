@@ -1,4 +1,3 @@
-import { createDownloadVerification } from "@/actions/downloadVerification";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import Image from "next/image";
@@ -7,19 +6,22 @@ import "./productCard.css";
 type ProductCardProps = {
   id: string;
   name: string;
+  author?: string;
   description: string;
   priceInCents: number;
   imagePath: string;
+  downloadVerificationId?: string;
 };
 
-export async function DownloadProduct({
+export function ProductCard({
   id,
   name,
+  author,
   description,
+  priceInCents,
   imagePath,
+  downloadVerificationId,
 }: ProductCardProps) {
-  const downloadLinkId = await createDownloadVerification(id);
-
   return (
     <div className="card">
       <div className="card-image-container">
@@ -27,13 +29,26 @@ export async function DownloadProduct({
       </div>
       <div className="card-header">
         <h2 className="card-title">{name}</h2>
+        {author && <p className="card-description">{author}</p>}
       </div>
       <div className="card-content">
         <p className="line-clamp-4">{description}</p>
       </div>
       <div className="card-footer">
         <Button asChild size="lg" className="button-full-width">
-          <Link href={`/products/download/${downloadLinkId}`}>Download</Link>
+          {downloadVerificationId ? (
+            <Link href={`/products/download/${downloadVerificationId}`}>
+              Download
+            </Link>
+          ) : (
+            <Link href={`/products/${id}/purchase`}>
+              Buy{" "}
+              {(priceInCents / 100).toLocaleString("da-DK", {
+                style: "currency",
+                currency: "DKK",
+              })}
+            </Link>
+          )}
         </Button>
       </div>
     </div>

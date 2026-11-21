@@ -34,11 +34,38 @@ public record ProductDto
     public required DateTime CreatedAt { get; init; }
     public required DateTime UpdatedAt { get; init; }
 }
+public sealed record AdminProductDto(
+    string Id,
+    string Name,
+    int PriceInCents,
+    bool IsAvailableForPurchase,
+    string FilePath,
+    int OrderCount
+    );
 
-public sealed record AdminProductDto : ProductDto
-{
-    public required string FilePath { get; init; }
-}
+
+public sealed record AdminDashboardDto(
+    SalesStatsDto Sales,
+    CustomerStatsDto Customers,
+    ProductStatsDto Products
+    );
+
+public sealed record AdminOrderDto(
+    string Id,
+    int PriceInCents,
+    string ProductName,
+    string UserEmail
+    );
+
+
+
+public sealed record AdminUserDto(
+    string Id,
+    string Email,
+    string Username,
+    int OrderCount,
+    long TotalSpentCents
+    );
 
 public class User : ITimestamped
 {

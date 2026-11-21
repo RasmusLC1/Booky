@@ -5,7 +5,9 @@
   flex-direction: column;
   overflow: hidden;
   height: 100%;
-  width: 300px; /* Adjust for narrower book-like appearance */
+  width: 100%;
+  max-width: 340px;
+  margin: 0 auto;
   border: 1px solid #ddd;
   border-radius: 8px;
   background: #fff;
