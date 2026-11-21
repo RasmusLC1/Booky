@@ -15,12 +15,12 @@ export async function middleware(req: NextRequest) {
 async function isAuthenticated(req: NextRequest) {
   const authHeader =
     req.headers.get("authorization") || req.headers.get("Authorization")
-
+  
   if (authHeader == null) return false
-
+  
   const [username, password] = Buffer.from(authHeader.split(" ")[1], "base64")
-    .toString()
-    .split(":")
+  .toString()
+  .split(":")
   //   admin found in .env
   return (
     username === process.env.ADMIN_USERNAME &&
@@ -32,5 +32,5 @@ async function isAuthenticated(req: NextRequest) {
 }
 
 export const config = {
-  matcher: "/admin/:path*", // subpages of the admin folder
+  matcher: ["/admin", "/admin/:path*"],
 };

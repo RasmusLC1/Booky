@@ -1,75 +1,103 @@
-import db from "@/db/db"
-import { NextRequest, NextResponse } from "next/server"
-import Stripe from "stripe"
-import { Resend } from "resend"
-import PurchaseReceiptEmail from "@/email/PurchaseReceipt"
+import { NextRequest, NextResponse } from "next/server";
+import Stripe from "stripe";
+import { Resend } from "resend";
+import PurchaseReceiptEmail from "@/email/PurchaseReceipt";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
-const resend = new Resend(process.env.RESEND_API_KEY as string)
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const resend = new Resend(process.env.RESEND_API_KEY!);
+
+interface FulfillOrderResponse {
+  orderId: string;
+  createdAt: string;
+  priceInCents: number;
+  productId: string;
+  productName: string;
+  productImagePath: string | null;
+  productDescription: string | null;
+  downloadVerificationId: string;
+}
 
 export async function POST(req: NextRequest) {
-  const event = await stripe.webhooks.constructEvent(
-    await req.text(),
-    req.headers.get("stripe-signature") as string,
-    process.env.STRIPE_WEBHOOK_SECRET as string
-  )
+  const rawBody = await req.text();
+  const signature = req.headers.get("stripe-signature");
+
+  if (!signature) {
+    return new NextResponse("Missing stripe-signature", { status: 400 });
+  }
+
+  let event: Stripe.Event;
+  try {
+    event = stripe.webhooks.constructEvent(
+      rawBody,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET!
+    );
+  } catch (err) {
+    console.error("Stripe webhook signature verification failed:", err);
+    return new NextResponse("Invalid signature", { status: 400 });
+  }
 
   if (event.type === "charge.succeeded") {
-    const charge = event.data.object as Stripe.Charge
-    const productid = charge.metadata.productid
-    const email = charge.billing_details.email
-    const priceInCents = charge.amount
-    const product = await db.product.findUnique({ where: { id: productid } })
-    if (product == null || email == null) {
-      return new NextResponse("Bad Request", { status: 400 })
+    const charge = event.data.object as Stripe.Charge;
+    const productId = charge.metadata?.productid;
+    const email = charge.billing_details?.email;
+    const priceInCents = charge.amount;
+
+    if (!productId || !email) {
+      return new NextResponse("Bad Request", { status: 400 });
     }
 
-    // 1. Check if user exists
-    const user = await db.user.findUnique({
-      where: { email },
-    })
-    // 2. If user does NOT exist, return error
-    if (!user) {
-      return NextResponse.json(
-        { message: "User does not exist. Please create an account." },
-        { status: 404 }
-      )
-    }
+    const normalizedEmail = email.trim().toLowerCase();
 
-    // 3. If the user exists, handle the order
-    const userFields = {
-      email,
-      orders: { create: { productid, priceInCents } },
-    }
-    const {
-      orders: [order],
-    } = await db.user.update({
-      where: { email },
-      data: userFields,
-      select: { orders: { orderBy: { createdAt: "desc" }, take: 1 } },
-    })
-    // Create a download link
-    const downloadVerification = await db.downloadVerification.create({
-      data: {
-        productid,
-        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
+    const apiRes = await fetch(`${process.env.API_URL}/api/orders/fulfill`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Internal-Key": process.env.INTERNAL_API_KEY!,
+        "X-User-Email": normalizedEmail,
       },
-    })
+      body: JSON.stringify({
+        productId,
+        email: normalizedEmail,
+        priceInCents,
+      }),
+      cache: "no-store",
+    });
 
-    // Send an email to the existing user
+    if (!apiRes.ok) {
+      const errBody = await apiRes.json().catch(() => null);
+      return NextResponse.json(
+        { message: errBody?.message ?? "Failed to fulfill order" },
+        { status: apiRes.status }
+      );
+    }
+
+    const fulfillment = (await apiRes.json()) as FulfillOrderResponse;
+
     await resend.emails.send({
       from: `Support <${process.env.SENDER_EMAIL}>`,
-      to: email,
+      to: normalizedEmail,
       subject: "Order Confirmation",
       react: (
         <PurchaseReceiptEmail
-          order={order}
-          product={product}
-          downloadVerificationId={downloadVerification.id}
-          serverUrl = {process.env.NEXT_PUBLIC_SERVER_URL || "https://booky-mu.vercel.app/"}
+          order={{
+            id: fulfillment.orderId,
+            priceInCents: fulfillment.priceInCents,
+            createdAt: new Date(fulfillment.createdAt),
+          }}
+          product={{
+            name: fulfillment.productName,
+            imagePath: fulfillment.productImagePath ?? "",
+            description: fulfillment.productDescription ?? "",
+          }}
+          downloadVerificationId={fulfillment.downloadVerificationId}
+          serverUrl={
+            process.env.NEXT_PUBLIC_SERVER_URL || "https://booky-mu.vercel.app/"
+          }
         />
       ),
-    })
+    });
   }
-  return new NextResponse()
+
+  return new NextResponse(null, { status: 200 });
 }

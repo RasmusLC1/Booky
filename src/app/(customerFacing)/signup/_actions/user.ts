@@ -1,9 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import db from "@/db/db";
-import bcrypt from "bcrypt";
-import { SendAccountCreationEmail } from "./accontCreationEmail"
+import { sendAccountCreationEmail } from "./accontCreationEmail"
 
 // Validation schema
 const addSchema = z.object({
@@ -35,37 +33,24 @@ export async function addUser(formData: FormData) {
     password: result.data.password,
   };
 
-  // 3. Check if user already exists
-  const existingUser = await db.user.findFirst({
-    where: {
-      OR: [{ email: data.email }, { username: data.username }],
+  // 3. Create the user in the .NET API
+  const res = await fetch(`${process.env.API_URL}/api/users/register`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Internal-Key": process.env.INTERNAL_API_KEY!.trim(),
     },
+    body: JSON.stringify(data),
   });
-  if (existingUser) {
-    return {
-      error: {
-        email: existingUser.email === data.email ? "Email is already in use" : "",
-        username: existingUser.username === data.username ? "Username is already in use" : "",
-      },
-    };
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    return body?.error && typeof body.error === "object"
+      ? { error: body.error as Record<string, string> }
+      : { error: { email: "Something went wrong. Please try again." } };
   }
-
-  // 4. Hash password
-  const hashedPassword = await bcrypt.hash(data.password, 12);
-
-  // 5. Store user in database
-  await db.user.create({
-    data: {
-      email: data.email,
-      username: data.username,
-      password: hashedPassword,
-    },
-  });
-
-  // 6. Send confirmation email
-  const emailFormData = new FormData();
-  emailFormData.append("email", data.email);
-  await SendAccountCreationEmail(emailFormData);
+  // 4. Send confirmation email
+  await sendAccountCreationEmail(data.email, data.username);
 
   return { success: true };
 }

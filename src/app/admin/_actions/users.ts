@@ -1,14 +1,26 @@
-"use server"
+"use server";
 
-import db from "@/db/db"
-import { notFound } from "next/navigation"
+export async function deleteUser(
+  id: string
+): Promise<{ deleted: boolean; notFound?: boolean }> {
+  const res = await fetch(
+    `${process.env.API_URL}/api/users/${encodeURIComponent(id)}`,
+    {
+      method: "DELETE",
+      headers: {
+        "X-Internal-Key": process.env.INTERNAL_API_KEY!,
+      },
+      cache: "no-store",
+    }
+  );
 
-export async function deleteUser(id: string) {
-  const user = await db.user.delete({
-    where: { id },
-  })
+  if (res.status === 404) {
+    return { deleted: false, notFound: true };
+  }
 
-  if (user == null) return notFound()
+  if (!res.ok) {
+    throw new Error(`Failed to delete user: ${res.status}`);
+  }
 
-  return user
+  return { deleted: true };
 }
