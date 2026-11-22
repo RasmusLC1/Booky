@@ -122,6 +122,7 @@ admin, products and orders
 
 
 ## Architecture
+```
 Booky/
 ├── Booky.Api/                  # ASP.NET Core Web API
 │   ├── Controllers/            # HTTP endpoints (thin, delegate to services)
@@ -138,3 +139,4 @@ Booky/
 │   └── middleware.ts           # Upstash rate limiting
 ├── .github/workflows/          # CI
 └── local_setup_guide.md        # Detailed local setup
+```
