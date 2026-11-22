@@ -119,3 +119,22 @@ admin, products and orders
 - Host the API somewhere public so the demo runs end to end again.
 - Add more interactivity with the site
 - Improve flow and general optimisations
+
+
+## Architecture
+Booky/
+├── Booky.Api/                  # ASP.NET Core Web API
+│   ├── Controllers/            # HTTP endpoints (thin, delegate to services)
+│   ├── Services/               # Business rules: orders, users, downloads, products, admin, password reset
+│   ├── Data/                   # EF Core DbContext and entities
+│   ├── Utility/                # Shared validation helpers
+│   └── Program.cs              # DI setup and service-key middleware
+├── src/                        # Next.js frontend
+│   ├── app/                    # Pages, route handlers (thin proxies to the API) and Stripe webhook
+│   ├── actions/                # Server actions
+│   ├── components/             # UI components
+│   ├── email/                  # React Email templates
+│   ├── lib/                    # Helpers and API clients
+│   └── middleware.ts           # Upstash rate limiting
+├── .github/workflows/          # CI
+└── local_setup_guide.md        # Detailed local setup
