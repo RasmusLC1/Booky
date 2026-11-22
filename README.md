@@ -1,86 +1,121 @@
-# Booky - E-Commerce Platform  
-**Hosted on:** [Booky on Vercel](https://booky-mu.vercel.app)  
+# Booky
 
-## 📖 Description  
-Booky is a full-stack e-commerce platform for books, built with **Next.js** and **TypeScript**, featuring secure payments, user authentication, automated emails, and an admin dashboard. Designed for **scalability, performance, and security**.  
+An online bookstore I built to learn how a real shop fits together: accounts, payments, emails, protected downloads and an admin area. It started as a Next.js app with a Node/Prisma backend, and I've been migrating the backend to a custom **ASP.NET Core Web API**.
 
-## 🛠️ Technology Stack  
-- **Language:** TypeScript  
-- **Frameworks:** [Next.js](https://nextjs.org/) (React), [Node.js](https://nodejs.org/) (Backend API)  
-- **Authentication:** [NextAuth](https://next-auth.js.org/), bcrypt (password encryption)  
-- **Database:** [PostgreSQL](https://www.postgresql.org/) via [Prisma ORM](https://www.prisma.io/) (hosted on [Supabase](https://supabase.com/))  
-- **APIs:** [Stripe](https://stripe.com/) (Payments), [Resend](https://resend.com/) (Emails), [EdgeStore](https://edgestore.dev/) (File handling)  
-- **Security:** HTML Sanitization (XSS prevention), [Zod](https://zod.dev/) (validation)  
-- **Hosting & Deployment:** [Vercel](https://vercel.com/)  
+**Live demo (Currently down) (frontend):** [booky-mu.vercel.app](https://booky-mu.vercel.app)
+This is a portfolio project, not a real shop. Payments run in Stripe test mode, so use the test card `4242 4242 4242 4242` with any future expiry and any CVC.
 
-## 🚀 Features  
-✅ **User Authentication & Profiles** – Secure login via NextAuth & bcrypt, with profile management and order history.  
-✅ **Secure Payments** – Fast, encrypted transactions using Stripe.  
-✅ **Password Reset & Emails** – Automated secure reset links via Resend API.  
-✅ **Secure File Uploads** – EdgeStore validation to prevent malicious content.  
-✅ **Optimized Database Queries** – Indexed search and filtering via Prisma ORM & PostgreSQL.  
-✅ **XSS & Input Sanitization** – Prevents cross-site scripting and unsafe user input.  
-✅ **Dynamic Routing & URL Security** – Randomized product IDs to prevent scraping.  
-✅ **Admin Dashboard** – Manage users, products, orders, feedback, and moderation.  
-✅ **Scalable Cloud Deployment** – Hosted on Supabase & Vercel for reliability.  
-✅ **CI/CD Integration** – Automated testing & deployment via GitHub Actions.  
+## How it's put together
 
-## 🏗️ How to Run
+```
+Browser → Next.js (pages, session check, rate limiting) → ASP.NET Core API → SQLite
+```
 
-## 1. Install Dependencies  
-Ensure you have **Node.js** and **npm** installed, then run:  
+- **Next.js** renders the pages, handles login sessions with NextAuth and rate-limits requests. Its API routes act as thin proxies.
+- **ASP.NET Core Web API** owns the data and business rules: orders, users, products, reviews, password-reset tokens and download verification, using EF Core.
+- The two talk over a shared service key. Next.js checks who is logged in and forwards the user's email, and the API only accepts requests that carry the key. The API is not meant to be reachable from the public internet.
+
+## Tech stack
+
+| Area | What I used |
+|---|---|
+| Backend | C#, ASP.NET Core Web API, Entity Framework Core, SQLite |
+| Frontend | TypeScript, React, Next.js |
+| Auth | NextAuth (credentials + Google), bcrypt password hashing |
+| Payments & email | Stripe (test mode), Resend |
+| File storage | EdgeStore |
+| Validation & protection | Zod, Upstash rate limiting |
+| Hosting | Vercel (frontend) |
+
+## What it does
+
+- **Accounts:** register, log in with email or Google, and view your orders.
+- **Payments:** checkout through Stripe, with orders recorded in the .NET API.
+- **Protected downloads:** a book can only be downloaded by someone who bought it. The API issues a download token that expires after 24 hours and streams the file, so the storage URL is never shown to the browser.
+- **Password reset:** emailed reset links with expiring tokens.
+- **Reviews:** star ratings per product.
+- **Order history emails:** a customer can have their orders and fresh download links sent to their inbox.
+- **Admin area:** manage products, users and orders.
+
+## Running it locally
+
+You'll need Node.js, npm and the .NET SDK installed.
+
+### 1. Start the API
+
+```sh
+cd Booky.Api
+dotnet user-secrets init
+dotnet user-secrets set "InternalApiKey" "pick-a-long-random-string"
+dotnet ef database update
+dotnet run
+```
+
+`dotnet ef database update` creates `booky.db` with all the tables. Note the port that `dotnet run` prints.
+
+### 2. Configure the frontend
+
+Create a `.env` file in the project root:
+
+```
+API_URL=http://localhost:5123            # the port dotnet run printed
+INTERNAL_API_KEY=pick-a-long-random-string   # must match the secret above
+
+NEXTAUTH_SECRET=...
+NEXTAUTH_URL=http://localhost:3000
+STRIPE_SECRET_KEY=sk_test_...
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+RESEND_API_KEY=...
+SENDER_EMAIL=...
+UPSTASH_REDIS_REST_URL=...
+UPSTASH_REDIS_REST_TOKEN=...
+GOOGLE_ID=...
+GOOGLE_SECRET=...
+GITHUB_ID=...
+GITHUB_SECRET=...
+EDGE_STORE_ACCESS_KEY=...
+EDGE_STORE_SECRET_KEY=...
+ADMIN_USERNAME=...
+ADMIN_HASHED_PASSWORD=...(For now manually encrypt password with Bcrypt)
+```
+
+### 3. Start the frontend
 
 ```sh
 npm install
-```
-
-2. Start the Development Server
-
-To run the app in development mode, use:
-
-```sh
 npm run dev
 ```
 
-This will:
-
-  Start the Next.js development server
-  Listen for Stripe webhooks and forward them to http://localhost:3000/webhooks/stripe
-
-3. Build the Application
-
-Before deploying, generate the Prisma client and build the Next.js app:
+The app runs at http://localhost:3000. To test payments locally, forward Stripe webhooks with the Stripe CLI:
 
 ```sh
-npm run build
+stripe listen --forward-to localhost:3000/webhooks/stripe
 ```
 
-4. Start the Production Server
+### Other commands
 
-After building, start the production server with:
+| Command | What it does |
+|---|---|
+| `npm run build` | Production build of the frontend |
+| `npm run start` | Serve the production build |
+| `npm run lint` | Check the code for lint errors |
+| `npm run email` | Preview email templates on port 3001 (served from `src/email`) |
 
-```sh
-  npm run start
-```
+### Admin password
 
-5. Lint the Code
+The admin area is protected by a password stored in `.env`. <!-- TODO: replace this with proper admin accounts -->
 
-To check for linting errors, run:
+## Where the migration stands
 
-```sh
-npm run lint
-```
+I'm moving the backend to .NET one route at a time and keeping the frontend working at each step.
 
-6. Run the Email Development Server
+- **Done in .NET:** The functionality has been migrated over fully including downloads, stripe, users,
+admin, products and orders
+- **Still to move:** Unit testing is currently in progress
 
-To preview emails, run:
+## What I'd do next
 
-```sh
-npm run email
-```
-
-This serves emails from the src/email directory on port 3001.
-
-
-7. Setting Admin password
-Add a console log to isValidPassword to see the password being sent and add it to .env
+- Host the API somewhere public so the demo runs end to end again.
+- Add more interactivity with the site
+- Improve flow and general optimisations
