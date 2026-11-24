@@ -34,7 +34,7 @@ const handler = NextAuth({
         formData.set("password", credentials?.password || "");
 
         const result = await loginVerification(formData);
-        if (result?.success) {
+        if (result && "success" in result && result.success) {
           return {
             id: "UserIdInDB",
             name: credentials?.email,
