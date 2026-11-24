@@ -1,12 +1,4 @@
-// createAccountIfNeeded.ts
-
 "use server";
-import { randomBytes } from "crypto";
-
-
-function generateRandomPassword(): string {
-    return randomBytes(32).toString("hex"); // 64-character hex string
-  }
 /**
  * Creates a new user record if one doesn't already exist for the given email.
  * Called from the NextAuth signIn callback.
