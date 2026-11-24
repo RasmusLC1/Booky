@@ -1,5 +1,3 @@
-Crowdsourced Bookshop
-
 sign up and login
 Star rating for books
 Users can leave reviews
