@@ -51,6 +51,14 @@ public sealed record ServiceResult<T>(
 
 public class DownloadService(AppDbContext db, IHttpClientFactory httpClientFactory)
 {
+    private static readonly char[] InvalidFileNameChars =
+        Path.GetInvalidFileNameChars()
+            .Concat([':', '\\', '/', '*', '?', '"', '<', '>', '|'])
+            .Distinct()
+            .ToArray();
+
+    private static string SanitizeFileName(string name) =>
+        string.Join("_", name.Split(InvalidFileNameChars));
     public async Task<ServiceResult<string>> CreateVerificationAsync(
         string? email,
         string? productId,
@@ -234,7 +242,7 @@ public class DownloadService(AppDbContext db, IHttpClientFactory httpClientFacto
         }
 
         var extension = Path.GetExtension(fileUri.AbsolutePath);
-        var safeName = string.Join("_", verification.Name.Split(Path.GetInvalidFileNameChars()));
+        var safeName = SanitizeFileName(verification.Name);
         var downloadName = string.IsNullOrEmpty(extension) ? safeName : $"{safeName}{extension}";
 
         return new DownloadFilePayload(remoteRes, await remoteRes.Content.ReadAsStreamAsync(ct))
