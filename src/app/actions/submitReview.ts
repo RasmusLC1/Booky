@@ -1,7 +1,6 @@
 "use server";
 
 import { z } from "zod";
-import db from "@/db/db";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 
