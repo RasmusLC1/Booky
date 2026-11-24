@@ -4,7 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("Default") ?? "Data Source=booky.db";
 
 builder.Services.AddDbContext<AppDbContext>(o =>
-    o.UseSqlite("Data Source=booky.db"));
+    o.UseSqlite(connectionString));
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ProductService>();
