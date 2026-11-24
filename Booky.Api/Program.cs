@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+var connectionString = builder.Configuration.GetConnectionString("Default") ?? "Data Source=booky.db";
 
 builder.Services.AddDbContext<AppDbContext>(o =>
     o.UseSqlite("Data Source=booky.db"));
@@ -13,6 +14,7 @@ builder.Services.AddScoped<AdminService>();
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 builder.Services.AddSingleton<Validation>();
+
 
 var app = builder.Build();
 
@@ -33,3 +35,5 @@ app.Use(async (ctx, next) =>
 
 app.MapControllers();
 app.Run();
+
+public partial class Program { } // Test access
