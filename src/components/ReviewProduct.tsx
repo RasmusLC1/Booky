@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useTransition } from "react";
-import { submitReview } from "@/app/actions/submitReview";
+// import { submitReview } from "@/app/actions/submitReview";
 import "./ReviewProduct.css";
 
 export function ReviewProduct({ productid }: { productid: string }) {
@@ -48,7 +48,7 @@ export function ReviewProduct({ productid }: { productid: string }) {
         formData.append("rating", value.toString());
         formData.append("userid", userid);
         
-        await submitReview(formData);
+        // await submitReview(formData);
         setRating(value);
       } catch (error) {
         console.error("Submission error:", error);
