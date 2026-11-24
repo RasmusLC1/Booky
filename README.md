@@ -89,6 +89,41 @@ curl -i http://localhost:5123/api/products/newest
 curl -i -H "X-Internal-Key: pick-a-long-random-string" http://localhost:5123/api/products/newest
 # HTTP/1.1 200  with [] on an empty database
 ```
+# Backend connection (must match the API)
+API_URL=http://localhost:5123
+INTERNAL_API_KEY=pick-a-long-random-string
+
+# Auth
+NEXTAUTH_SECRET=...            # generate with: openssl rand -base64 32
+NEXTAUTH_URL=http://localhost:3000
+GOOGLE_ID=...                  # optional
+GOOGLE_SECRET=...              # optional
+GITHUB_ID=...                  # optional
+GITHUB_SECRET=...              # optional
+
+# Payments and email
+STRIPE_SECRET_KEY=sk_test_...
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+RESEND_API_KEY=...
+SENDER_EMAIL=...
+
+# Rate limiting (the middleware needs these to start)
+UPSTASH_REDIS_REST_URL=...
+UPSTASH_REDIS_REST_TOKEN=...
+
+# File uploads
+EDGE_STORE_ACCESS_KEY=...
+EDGE_STORE_SECRET_KEY=...
+
+# Admin login
+ADMIN_USERNAME=...
+ADMIN_HASHED_PASSWORD=...
+```
+
+Don't put `# comments` on the same line as a value in your real `.env`. Some parsers treat them as part of the value.
+
+### 3. Start the frontend
 
 Leave this terminal running.
 
