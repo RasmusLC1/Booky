@@ -8,6 +8,26 @@ const genericMessage = {
   message: "Check your email to view your order history and download your products.",
 }
 
+interface OrderHistoryProduct {
+  id: string
+  name: string
+  imagePath: string
+  description: string
+}
+
+interface RawOrderHistoryItem {
+  id: string
+  priceInCents: number
+  createdAt: string
+  product: OrderHistoryProduct
+  downloadVerificationId: string
+}
+
+interface OrderHistoryResponse {
+  email: string
+  orders: RawOrderHistoryItem[]
+}
+
 export async function emailOrderHistory(
   userEmail: string
 ): Promise<{ message?: string; error?: string }> {
@@ -24,8 +44,11 @@ export async function emailOrderHistory(
   if (res.status === 404) return genericMessage // unknown user: same answer as before
   if (!res.ok) return { error: "There was an error sending your email. Please try again." }
 
-  const user = await res.json()
-  const orders = user.orders.map((o: any) => ({ ...o, createdAt: new Date(o.createdAt) }))
+  const user = (await res.json()) as OrderHistoryResponse
+  const orders = user.orders.map((o) => ({
+    ...o,
+    createdAt: new Date(o.createdAt),
+  }))
 
   const data = await resend.emails.send({
     from: `Support <${process.env.SENDER_EMAIL}>`,
