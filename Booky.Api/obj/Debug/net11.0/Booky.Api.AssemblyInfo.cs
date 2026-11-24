@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Booky.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+edbdee9dfca2dc020202bd809d6e92394e052587")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+47ad32db6152518f4e28340e60ce504d4fc24148")]
 [assembly: System.Reflection.AssemblyProductAttribute("Booky.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Booky.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
