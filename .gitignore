@@ -45,3 +45,5 @@ next-env.d.ts
 *.dll
 *.gz
 *.pack
+*.db-shm
+*.db-wal
