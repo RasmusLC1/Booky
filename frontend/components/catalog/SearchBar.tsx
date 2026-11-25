@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import type { Product } from "../../lib/products";
+import type { Product } from "@/lib/products";
 
 interface ProductsSearchProps {
   products: Product[];

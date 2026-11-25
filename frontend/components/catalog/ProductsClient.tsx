@@ -3,10 +3,10 @@
 import React, { useMemo, useState } from "react";
 import ProductsSearch from "./SearchBar";
 import Filter from "./Filter";
-import { Button } from "../ui/button";
-import { emailOrderHistory } from "../../actions/orders";
-import { ProductCard } from "../ProductCard";
-import type { Product } from "../../lib/products";
+import { Button } from "@/components/ui/button";
+import { emailOrderHistory } from "@/actions/orders";
+import { ProductCard } from "@/components/ProductCard";
+import type { Product } from "@/lib/products";
 import "./productClient.css";
 
 export type CatalogVariant = "catalog" | "orders";

@@ -1,10 +1,10 @@
-import { Button } from "../../components/ui/button";
-import { ProductCard, ProductCardSkeleton } from "../../components/ui/ProductCard";
-import { type Product, fetchMostPopular, fetchNewest } from "../../lib/products";
+import { Button } from "@/components/ui/button";
+import { ProductCard, ProductCardSkeleton } from "@/components/ui/ProductCard";
+import { type Product, fetchMostPopular, fetchNewest } from "@/lib/products";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
-import { cache } from "../../lib/cache"
+import { cache } from "@/lib/cache"
 
 const getMostPopularProducts = cache(
   fetchMostPopular,

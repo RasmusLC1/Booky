@@ -2,9 +2,9 @@
 
 import React, { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Input } from "../../../components/ui/input";
-import { Label } from "../../../components/ui/label";
-import { Button } from "../../../components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { sendPasswordReset } from "./_actions/resetPassword";
 
 export default function PasswordResetPage() {

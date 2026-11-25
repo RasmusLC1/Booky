@@ -1,8 +1,8 @@
-import { ProductCardSkeleton } from "../../../components/ui/ProductCard";
+import { ProductCardSkeleton } from "@/components/ui/ProductCard";
 import { Suspense } from "react";
-import { cache } from "../../../lib/cache";
-import { fetchAllProducts } from "../../../lib/products";
-import ProductsClient from "../../../components/catalog/ProductsClient";
+import { cache } from "@/lib/cache";
+import { fetchAllProducts } from "@/lib/products";
+import ProductsClient from "@/components/catalog/ProductsClient";
 
 export default function ProductsPage() {
   return (

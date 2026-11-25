@@ -1,5 +1,5 @@
 import { PageHeader } from "../_components/PageHeader";
-import { Button } from "../../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -7,17 +7,17 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../../../components/ui/table";
+} from "@/components/ui/table";
 import Link from "next/link";
 import { CheckCircle2, MoreVertical, XCircle } from "lucide-react";
-import { formatCurrency, formatNumber } from "../../../lib/formatters";
+import { formatCurrency, formatNumber } from "@/lib/formatters";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../../../components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import {
   ActiveToggleDropdownItem,
   DeleteDropdownItem,

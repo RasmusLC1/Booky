@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Stripe from "stripe";
 import { CheckoutForm } from "./_components/CheckoutForm";
-import { fetchProductById } from "../../../../../lib/products";
+import { fetchProductById } from "@/lib/products";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
